@@ -1,0 +1,28 @@
+We want to prove a closed form for $\hh^n(\bot)(G)$.
+\begin{lemma}[continues=lem:ext:closedformhh]
+	\begin{proof}
+		Proof by induction over $n$. \\
+		\textbf{Base case} for $n = 0$: \\
+		\[ \hh^0(\bot)(G) = \bot(G) = 0 = \sum_{i = 0}^{0 - 1} \resN{\wh^i(G)} \]
+		Note the empty sum in the last step. \\
+		\textbf{Induction hypothesis}:
+		\[ \hh^n(\bot)(G) = \sum_{i = 0}^{n-1} \resN{\wh^i(G)}, \text{ for some } n \in \N \]
+		\textbf{Inductive step}:
+		\begin{align*}
+			 & \hh^{n+1}(\bot)(G) \\
+			=& \hh( \hh^n(\bot) )(G) \\
+			 & \explain{definition of $\hh$} \\
+			=& \resN{G} + \hh^n(\bot) ( \smtx{P}(\resP{G}) ) \\
+			 & \explain{definition of $\wh$} \\
+			=& \resN{G} + \hh^n(\bot) ( \wh(G) ) \\
+			 & \explain{apply induction hypothesis} \\
+			=& \resN{G} + \sum_{i=0}^{n-1} \resN{ \wh^i( \wh(G) )} \\
+			=& \resN{G} + \sum_{i=0}^{n-1} \resN{ \wh^{i+1}(G)} \\			
+			 & \explain{offset indices} \\
+			=& \resN{G} + \sum_{i=1}^{n} \resN{ \wh^i(G)} \\
+			 & \explain{$\wh^0$ is the identity function} \\
+			 & \resN{ \wh^0(G) } + \sum_{i=1}^{n} \resN{ \wh^i(G)} \\
+			=& \sum_{i=0}^{n} \resN{ \wh^i(G)}		\qedhere
+		\end{align*}
+	\end{proof}
+\end{lemma}

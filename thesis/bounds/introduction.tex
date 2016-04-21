@@ -1,0 +1,19 @@
+Probabilistic programs are programs that do not always produce the same result for one set of inputs.
+This is achieved by the usage of probabilistic operations, which are embedded into the programming language itself.
+%Contrary to randomised programs, probabilistic programs do not rely on an external source of randomness, but use this inherent mechanism to make random decisions.
+Applications are in testing, where error rates can be modelled easily using probabilistic programs.
+They can also be used to solve problems that are very hard to solve or are not solvable at all using classical programming paradigms \cite{motwani:randomized}. \\
+Because of its non-deterministic nature, code written by using a probabilistic programming language is not easily verified just by reading and understanding.
+To obtain insights about properties such as correctness and termination probability, a formal method is necessary.
+It should allow to derive statements about the aforementioned properties.
+Unlike program code, which describes how something is calculated, the formal method must keep track of what happens while a program is executed.
+What happens, or the meaning of the process, is called the program's semantics.
+One idea to define a semantics is to keep track of all possible variable valuations, called the program states. \\
+Probabilistic programs are not deterministic.
+Consequently, program states only have a probability of appearing as result of the whole computation.
+To capture all program states with their probabilities, \emph{probability generating functions} (PGFs) can be used.
+This thesis is built on work of Scherbaum \cite{clara:pgf}, which uses \emph{formal power series} as PGFs.
+These PGFs lack the possibility of having variables with negative values.
+Thus, even simple programs that use subtraction cannot be represented by one of those PGFs.
+In this work, we will extend Scherbaum's model, so that variables can also have negative values.
+Later, we will show that the newly derived semantics is equivalent to an already established one which was introduced by McIver and Morgan.~\cite{mciver:abstraction_refinement}.

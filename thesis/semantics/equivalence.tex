@@ -1,0 +1,256 @@
+We want to prove that our semantics is equivalent to an already established one.
+We chose McIver and Morgan's \emph{weakest preexpectation semantics}~\cite{mciver:abstraction_refinement}, for short wp-semantics.
+The underlying programming language they use is basically the same as in this work.
+In addition to the seven operations we use in our programming language, it contains a nondeterministic choice operator.
+Since we lack that operator, we will prove the equivalence of all programs that do not use it.
+While our semantics transforms PGFs, the wp-semantics transforms expectations.
+
+\begin{definition}[Expectation~\cite{mciver:abstraction_refinement}]
+	An \emph{expectation} $f$ is a map from the state space $\S$ into the nonnegative reals.
+	The set $E$ of all expectations is \[ E = \{ \S \to \R_{\geq 0} \} \]
+\end{definition}
+In our case, the set of all program states is $\S = \Z^k$.
+An expectation can be given as an expression over the program variables.
+The wp-semantics itself is defined by inductively on the operations in the programming language.
+
+\begin{definition}[wp-Semantics~\cite{mciver:abstraction_refinement}]
+	Let $B$ be a Boolean condition, $P$ and $Q$ programs and $f$ an expectation.
+	The weakest preexpectation semantics $\operatorname{wp}$ of a program is defined as follows:
+	\begin{enumerate}
+		\item $\wp{\nop, f} = f$.
+		\item $\wp{\abort, f} = 0$. \label{wp:abort}
+		\item $\wp{X := e, f} = f[X/e]$. \label{wp:assign}
+		\item $\wp{P; Q, f} = \wp{P, \wp{Q, f}}$.
+		\item $\wp{\ifp{B}{P}{Q}, f}
+			= [B] \cdot \wp{P, f} + [\lnot B] \cdot \wp{Q, f}$. \label{wp:if}
+		\item $\wp{\{ P \}[p]\{ Q \}, f}
+			= p \cdot \wp{P, f} + (1-p) \cdot \wp{Q, f}$.
+		\item $\wp{\while{B}{P}, f}
+			= \mu X. \l( [B] \cdot \wp{P, X} + [\lnot B] \cdot f \r)$. \label{wp:while}
+	\end{enumerate}
+\end{definition}
+In~\ref{wp:abort}, 0 is the null expectation $f(s) = 0$ for any program state $s$.
+The expression $f[X/e]$ in~\ref{wp:assign} means that every occurrence of $X$ in $f$ is replaced with $e$.
+When $f$ is given as an expression over the program variables, this replaces $X$ with its assigned value.
+In~\ref{wp:if} and~\ref{wp:while}, $[B]$ is a function from the state space to $\{0, 1\}$:
+\begin{align*}
+%	& [B] \colon S \to \{0, 1\} \\
+	& [B](s) = \begin{cases}
+		0 & \text{ if } s \models B \\
+		1 & \text{ otherwise}
+	\end{cases}
+\end{align*}
+$[B]$ is multiplied by an expectation $f$, so that $([B] \cdot f)(s) = [B](s) \cdot f(s)$.
+This nulls the expectation for all program states that do not satisfy the condition and keeps the expectation's value everywhere else.
+It resembles the restriction $\resP{G}$ that we introduced for our semantics.
+The wp-semantics of the loop is also defined by a least fixed point.
+$\mu$ is the fixed point operator.
+It returns the least fixed point of the function $\ww(X) = [B] \cdot \wp{P, X} + [\lnot B] \cdot f$ iterated on the null expectation. \\
+In order to prove the equivalence of the two semantics, we will show that the expected value of an expectation is the same in both semantics.
+\begin{definition}
+	Let $\mu \colon \S \to [0, 1]$ be a measure and $f$ an expectation.
+	The \emph{expected value} $\E_\mu(f)$ is defined as follows.
+	\[ \E_\mu(f) = \sum_{s \in \S} \mu(s) \cdot f(s) \]
+\end{definition}
+A measure assigns a probability to every program state.
+Let $f$ be an expectation.
+The expected value of $f$ after executing a program $P$ can be expressed in both semantics.
+Given a measure $\mu$, executing $P$ in the wp-semantics means transforming $f$ and then calculating the expected value:
+\[ \E_\mu(\wp{P, f}) \]
+$\mu$ corresponds to the initial distribution of the variables and $\wp{P, f}$ corresponds to the execution of $P$.
+For example, in the programs from the previous chapters, it was always
+\[ \mu(s) = \begin{cases}
+	1 & \text{ if } s = (0, \ldots, 0) \\
+	0 & \text{ otherwise}
+\end{cases} \]
+Since our semantics transforms PGFs and not expectations, the expectation after the execution must be expressed differently.
+A PGF is a formal power series whose coefficients correspond to the probability of program state encoded in the exponents of the variables.
+Thus, for every PGF there is a corresponding measure.
+\begin{theorem}
+	For every PGF $G = \sum_{s \in \Z^k} \mu_s \Xok$ there is a corresponding measure $\mu_G$.
+	$\mu_G(s_1, \ldots, s_k)$ equals the coefficient of $\Xok$.
+\end{theorem}
+Transforming a PGF means transforming a measure.
+We can now express what we are looking for:
+\[ \E_{\smtx{P}(\mu)}(f) \]
+Here, $\smtx{P}(\mu)$ means that $\mu$ is transformed according to the same rules that we would transform its corresponding PGF with.
+We will go on to prove that both versions of the expectation after execution have the same value.
+
+\begin{theorem}
+	Given a program $P$, a measure $\mu$ and an expectation $f$, the following holds:
+	\[ \E_{\smtx{P}(\mu)} (f) = \E_\mu (\wp{P, f}) \]
+	\begin{proof}
+		Proof by induction over the program structure. \\
+		\textbf{Base Cases}:
+		\begin{description}
+			\item[($\nop$)] \begin{align*}
+				  & \E_{\smtx{\nop}(\mu)} (f) \\
+				  & \explain{definition expected value} \\
+				= & \sum_{s \in \S} \smtx{\nop}(\mu)(s) \cdot f(s) \\
+				  & \explain{PGF \nop\ semantics} \\
+				= & \sum_{s \in \S} \mu(s) \cdot f(s) \\
+				= & \E_\mu (f) \\
+				  & \explain{wp \nop\ semantics} \\
+				= & \E_\mu (\wp{\nop, f})
+			\end{align*}
+			\item[($\abort$)] \begin{align*}
+				  & \E_{\smtx{\abort}(\mu)} (f) \\
+				= & \sum_{s \in \S} \smtx{\abort}(\mu)(s) \cdot f(s) \\
+				  & \explain{PGF \abort\ semantics} \\
+				= & \sum_{s \in \S} 0 \cdot f(s) \\
+				= & \sum_{s \in \S} \mu(s) \cdot 0 \\
+				  & \explain{wp \abort\ semantics} \\
+				= & \sum_{s \in \S} \mu(s) \cdot \wp{\abort, f}(s) \\
+				= & \E_\mu (\wp{\abort, f})
+			\end{align*}
+			\item[($X_j := e$)] Given an index $1 \leq j \leq k$ of a variable,
+				a program state $s \in \S$ and an expression $e$, let
+				$$ I_j^s(e) = \{ (s_1, \dots, s_{j-1}, v, s_{j+1}, \dots, s_k) \mid
+					e(s_1, \dots, v, \dots, s_k) = s_j \} $$
+				$I_j^s(e)$ is the set of all program states that are mapped to the state $s$ by the semantics of the assignment $X_j := e$. \\
+				For example, given the PGF $G = \frac{1}{2} X_1^0 X_2^1 + \frac{1}{3} X_1^0 X_2^4$ and the assignment $X_2 := 2$. % expression $e(X_1, X_2) = 2$.
+				Then $\smtx{X_2 := 2}$ maps both distinct states of $G$ with their probabilities to one state with  combined probability:
+				$$\smtx{X_2 := e}(G) = \frac{1}{2} X_1^0 X_2^2 + \frac{1}{3} X_1^0 X_2^2
+					= \frac{5}{6} X_1^0 X_2^2 = \l( \sum_{s \in I_2^{0, 2}(2)} \mu(s) \r) \cdot X_1^0 X_2^2 $$
+				Note that $I_j^s(e)$ can also be the empty set, for example with $j = 2$ and $s = (0, 4)$ in the example above. \\
+				One can see that $I_j^s$ can be used to describe the terms that coincide after a variable assignment. 
+				We will use $I_j^s$ to factor out and group terms in the next step. \\
+				Therefore, consider now the general assignment $X_j := e$ which is dealt with in this base case of the induction.
+				As above, the assignment may map some distinct states to the same state, so we can also use $I_j^s(e)$ for appropriate $j$ and $s$ in the expected value.
+				\begin{align*}
+				  & \E_{\smtx{X_j := e}(\mu)} (f) \\
+				= & \sum_{s \in \S} \smtx{X_j := e}(\mu)(s) \cdot f(s) \\
+				  & \explain{replace with combined probabilities using $I_j^s$}  \\
+				= & \sum_{s \in \S} \l( \sum_{s' \in I_j^s(e)} \mu(s') \r) \cdot f(s) \\
+				\end{align*}
+				A similar approach works for the wp semantics.
+				Starting with the semantics of the assignment, we get the following.
+				$$ \wp{X_j := e, f}(s) = f[X_j/e](s) = f(s_1, \dots, s_{j-1}, e(s), s_{j+1}, \dots, s_k) $$
+				As before, there can be distinct program states $s$ for which $f(s_1, \dots, s_{j-1}, e(s), s_{j+1}, \dots, s_k)$ is the same.
+				In the sum of the expected value, these can be factored out and combined by using $I_j^s(e)$.
+				\begin{align*}
+				  & \E_\mu (\wp{X_j := e, f}) \\
+				= & \sum_{s \in \S} \mu(s) \cdot \wp{X_j := e, f}(s) \\
+				= & \sum_{s \in \S} \mu(s) \cdot f(s_1, \dots, s_{j-1}, e(s), s_{j+1}, \dots, s_k) \\
+				  & \explain{factor out all $f(s)$ that coincide} \\
+				= & \sum_{s \in \S} \l( \sum_{s' \in I_j^s(e)} \mu(s') \r) \cdot f(s)
+				\end{align*}
+				Now it is apparent that both expected values are equal.
+		\end{description}
+		\textbf{Induction Hypothesis}: \\
+		Let $P, Q$ be programs such that for all measures $\mu$ and expectations $f$ the following holds:
+		\begin{align*}
+			& \E_{\smtx{P}(\mu)} (f) = \E_\mu (\wp{P, f}) \\
+			& \E_{\smtx{Q}(\mu)} (f) = \E_\mu (\wp{Q, f})
+		\end{align*}
+		\textbf{Inductive Step}: \\
+		\begin{description}
+			\item[(\textit{if})] \begin{align*}
+				  & \E_{\smtx{\ifp{B}{P}{Q}}(\mu)} (f) \\
+				= & \sum_{s \in \S} \smtx{\ifp{B}{P}{Q}}(\mu)(s) \cdot f(s) \\
+				  & \explain{PGF \textit{if} semantics} \\
+				= & \sum_{s \in \S} \l( \smtx{P}(\resP{\mu})(s)
+					+ \smtx{Q}(\resN{\mu})(s) \r) \cdot f(s) \\
+				  & \explain{distribute $f(s)$, split sum} \\
+				= & \sum_{s \in \S} \smtx{P}(\resP{\mu})(s) \cdot f(s)
+					+ \sum_{s \in \S} \smtx{Q}(\resN{\mu})(s) \cdot f(s) \\
+				  & \explain{definition expected value} \\
+				= & \E_{\smtx{P}(\resP{\mu})} (f) + \E_{\smtx{Q}(\resN{\mu})} (f) \\
+				  & \explain{induction hypothesis} \\
+				= & \E_{\resP{\mu}} (\wp{P, f}) + \E_{\resN{\mu}} (\wp{Q, f}) \\
+				= & \sum_{s \in \S} \resP{\mu}(s) \cdot \wp{P, f}(s)
+					+ \sum_{s \in \S} \resN{\mu}(s) \cdot \wp{Q, f}(s) \\
+				  & \explain{$\resP{\mu} = B \cdot \mu$} \\
+				= & \sum_{s \in \S} [B](s) \cdot \mu(s) \cdot \wp{P, f}(s)
+					+ \sum_{s \in \S} [\lnot B](s) \cdot \mu(s) \cdot \wp{Q, f}(s) \\
+				  & \explain{merge sums, factor out $\mu(s)$} \\
+				= & \sum_{s \in \S} \mu(s) \cdot \l( [B](s) \cdot \wp{P, f}(s)
+					+ [\lnot B](s) \cdot \wp{Q, f}(s) \r) \\
+				  & \explain{wp \textit{if} semantics} \\
+				= & \sum_{s \in \S} \mu(s) \cdot \wp{\ifp{B}{P}{Q}, f}(s) \\
+				  & \explain{definition expected value} \\
+				= & \E_\mu ( \wp{\ifp{B}{P}{Q}, f} )
+			\end{align*}
+			
+			\item[(\textit{concatenation})] \begin{align*}
+				  & \E_{\smtx{P;Q}(\mu)} (f) \\
+				  & \explain{PGF concatenation} \\
+				= & \E_{\smtx{Q}(\smtx{P}(\mu))} (f) \\
+				  & \explain{induction hypothesis} \\
+				= & \E_{\smtx{P}(\mu)} (\wp{Q, f}) \\
+				  & \explain{induction hypothesis} \\
+				= & \E_\mu (\wp{P, \wp{Q, f}}) \\
+				& \explain{wp concatenation} \\
+				= & \E_\mu (\wp{P;Q, f})
+			\end{align*}
+			
+			\item[(\textit{prob. choice})] \begin{align*}
+				  & \E_{ \smtx{\{P\}[p]\{Q\}}(\mu) } (f) \\
+				= & \sum_{s \in \S} \smtx{\{P\}[p]\{Q\}}(\mu)(s) \cdot f(s) \\
+				  & \explain{PGF prob. choice} \\
+				= & \sum_{s \in \S} p \cdot \smtx{P}(\mu)(s) \cdot f(s)
+					+ (1-p) \cdot \smtx{Q}(\mu)(s) \cdot f(s) \\
+				  & \explain{factor out constants} \\
+				= & p \cdot \sum_{s \in \S} \smtx{P}(\mu)(s) \cdot f(s)
+					+ (1-p) \cdot \sum_{s \in \S} \smtx{Q}(\mu)(s) \cdot f(s) \\
+				  & \explain{definition expected value} \\
+				= & p \cdot \E_{ \smtx{P}(\mu) } (f)+
+					+ (1-p) \cdot \E_{ \smtx{Q}(\mu) } (f) \\
+				  & \explain{induction hypothesis} \\
+				= & p \cdot \E_\mu (\wp{P, f}) + (1-p) \cdot \E_\mu (\wp{Q, f}) \\
+				= & \E_\mu (p \cdot \wp{P, f} + (1-p) \cdot \wp{Q, f}) \\
+				= & \E_\mu (\wp{P[p]Q, f})
+			\end{align*}
+			
+			\item[(\textit{while})] Both, wp and PGF semantics, define the semantics of the while loop using a least	
+				fixed point iteration.
+				To prove the equivalence of both semantics, we prove that they are equivalent in every step of the iteration.
+				Recall both iteration functions for the loop body $P$ and the loop condition $B$:
+				\begin{description}
+					\item[PGF:] \[ \hh(f)(G) = \resN{G} + f \l( \wh(G) \r) \]
+						The iteration starts with the bottom element $\bot$ with $\bot(G) = 0$.
+					\item[wp:] The iteration function has no explicit name in the original paper, but as introduced above, we will call it $\ww$, where $f$ is a given expectation.
+						Then, \[ \ww(X) = [B] \cdot \wp{P, X} + [\lnot B] \cdot f \]
+						The iteration using $\ww$ starts with $0$, which is the null expectation.
+				\end{description}
+				Proof by induction over $n$. \\
+				\textbf{Base Case} for $n = 0$:
+				\begin{align*}
+					\E_{ \hh^0(\bot)(\mu) }(f) = \E_{ \bot(\mu) } (f) = \E_0(f) = 0 = \E_\mu(0) = \E_\mu (\ww^0(0))
+				\end{align*}
+				\textbf{Induction Hypothesis}:
+				$$ \E_{ \hh^n(\bot)(\mu) } (f) = \E_\mu (\ww^n(0)) \text{ for some } n \in \N $$
+				\textbf{Inductive Step}:
+				\begin{align*}
+				  & \E_{ \hh^{n+1}(\bot)(\mu) } (f) \\
+				= & \sum_{s \in \S} \hh^{n+1}(\bot)(\mu)(s) \cdot f(s) \\
+				  & \explain{split function composition} \\
+				= & \sum_{s \in \S} \hh(\hh^n(\bot))(\mu)(s) \cdot f(s) \\
+				  & \explain{definition of $\hh$} \\
+				= & \sum_{s \in \S} \l( \resN{\mu}
+					+ \hh^n(\bot)(\wh(\mu)) \r)(s) \cdot f(s) \\
+				  & \explain{distribute $f(s)$, split sums} \\
+				= & \sum_{s \in \S} \resN{\mu}(s) \cdot f(s)
+					+ \sum_{s \in \S} \hh^n(\bot)(\wh(\mu))(s) \cdot f(s) \\
+				= & \E_{\resN{\mu}} (f) + \E_{ \hh^n(\bot)(\wh(\mu)) } (f) \\
+				  & \explain{inner induction hypothesis} \\
+				= & \E_{ \resN{\mu} } (f) + \E_{ \wh(\mu) } \l( \ww^n (0) \r) \\
+				  & \explain{definition $\wh$} \\
+				= & \E_{ \resN{\mu} } (f)
+					+ \E_{ \smtx{P}(\resP{\mu}) } \l( \ww^n(0) \r) \\
+				  & \explain{outer induction hypothesis} \\
+				= & \E_{ \resN{\mu} } (f)
+					+ \E_{\resP{\mu}} \l( \wp{P, \ww^n (0)} \r) \\
+				= & \sum_{s \in \S}  \resN{\mu}(s) \cdot f(s)
+					+ \resP{\mu}(s) \cdot \wp{P, \ww^n (0)}(s) \\
+				 & \explain{$\resP{\mu} = B \cdot \mu$} \\
+				= & \sum_{s \in \S} [\lnot B](s) \cdot \mu(s) \cdot f(s)
+					+ [B](s) \cdot \mu(s) \cdot \wp{P, \ww^n (0)}(s) \\
+				= & \sum_{s \in \S} \mu(s) \cdot \l( [\lnot B](s) \cdot f(s) + [B](s) \cdot \wp{P, \ww^n (0)}(s) \r) \\
+				  & \explain{definition of $\operatorname{wp}$} \\
+				= & \sum_{s \in \S} \mu(s) \cdot \ww^{n+1} (0)(s) \\
+				= & \E_\mu \l( \ww^{n+1}(0) \r)			\qedhere
+			\end{align*}
+		\end{description}
+	\end{proof}
+\end{theorem}

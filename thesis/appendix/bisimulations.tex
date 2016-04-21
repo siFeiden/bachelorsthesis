@@ -1,0 +1,160 @@
+\begin{lemma}[label=lem:bisim:iteration]
+	Let $B$ be a boolean condition, $P$ a program and $R$ a basic bisimulation. \\
+	Then \[ \pair{K, G} \in R
+		\implies \pair{K - \sum_{i = 1}^{n} \resN{\wh^i(G)}, \wh^n(G)}
+		\in R \text{ for all } n \in \N \]
+	\begin{proof}
+		Proof by induction over $n$. \\
+		\textbf{Base case} for $n = 0$:
+		\begin{align*}
+					 & \pair{K, G} \in R \\
+			\implies & \pair{K - 0, G} \\
+					 & \explain{empty sum} \\
+			\implies & \pair{K - \sum_{i = 1}^{0} \resN{\wh(G)}, \wh^0(G)}
+		\end{align*}
+		\textbf{Induction hypothesis}:
+		 \[ \pair{K, G} \in R \implies
+			\pair{K - \sum_{i = 1}^{n} \resN{\wh^i(G)}, \wh^{n}(G)} \in R
+			\text{ for some } n \in \N \]
+		\textbf{Inductive step}: \\
+		$R$ is a basic bisimulation, so we can apply the iteration step to the induction hypothesis which yields
+		\begin{align*}
+				 & \pair{K, G} \in R \\
+				 & \explain{induction hypothesis} \\
+		\implies & \pair{K - \sum_{i = 1}^{n} \resN{\wh^i(G)}, \wh^{n}(G)} \in R \\
+				 & \explain{property ii) of weak bisimulations} \\
+		\implies & \pair{K - \sum_{i = 1}^{n} \resN{\wh^i(G)} - \resN{\wh(\wh^n(G))}
+			, \wh(\wh^{n}(G))} \in R \\
+		\implies & \pair{K - \sum_{i = 1}^{n} \resN{\wh^i(G)} - \resN{\wh^{n+1}(G)}
+			, \wh^{n+1}(G)} \in R \\
+		\implies & \pair{K - \sum_{i = 1}^{n+1} \resN{\wh^i(G)}
+			, \wh^{n+1}(G)} \in R
+		\end{align*}
+	\end{proof}
+\end{lemma}
+
+\begin{theorem}[continues=theo:bisim:overapprox, label=proof:bisim:overapprox]
+	Let $B$ be a Boolean condition, $P$ a program and $R$ a weak bisimulation. \\
+	Then \[ \pair{K, G} \in R \land G \models B
+		\implies \smtx{\while{B}{P}}(G) \leqD K \]
+	\begin{proof}
+		\begin{align*}
+					 & \pair{K, G} \in R \land G \models B \\
+					 & \explain{Lemma~\ref{lem:bisim:iteration}} \\
+			\implies & \pair{K - \sum_{i = 1}^{n} \resN{\wh^i(G)}, \wh^n(G)} \in R \\
+					 & \land \resN{G} = 0 \\
+					 & \explain{property i) of weak bisimulations} \\
+			\implies & \resN{\wh\left(\wh^n(G)\right)}
+				\leqD K - \sum_{i=1}^n \resN{\wh^i(G)} \\
+					 & \land \resN{\wh^0(G)} = 0 \\
+			\implies & \resN{\wh^0(G)} + \sum_{i=1}^n \resN{\wh^i(G)} + \resN{\wh^{n+1}(G)} \leqD K \\
+			\implies & \sum_{i=0}^{n+1} \resN{\wh^i(G)} \leqD K \\
+			\implies & \sup_{n \in \N} \sum_{i=0}^{n+1} \resN{\wh^i(G)}
+				\leqD \sup_{n \in \N} K \\
+			\implies & \smtx{\while{B}{P}}(G) \leqD K
+		\end{align*}
+	\end{proof}
+\end{theorem}
+
+\begin{lemma}[label=lem:bisim:iterateeps]
+	Let $B$ be a Boolean condition, $P$ a program and $R$ a strong bisimulation for $B$ and $P$ with constant $\varepsilon$.
+	Then,
+	\[ \pair{K, G} \in R \implies \l| K \r| - \l| \sum_{i=1}^{n} \resN{\wh^i(G)} \r|
+		\leq (1-\varepsilon)^n \cdot |K| \text{ for all } n \in \N \]
+	\begin{proof}
+		Proof by induction over $n$. \\
+		\textbf{Base case} for $n = 0$:
+		\[ |K| - \l| \sum_{i=1}^{0} \resN{\wh^i(G)} \r|
+			= |K| - |0| \leq 1 \cdot |K| = (1-\varepsilon)^0 \cdot |K| \]
+		\textbf{Induction hypothesis}:
+		\[ \pair{K, G} \in R \implies \l| K \r| - \l| \sum_{i=1}^{n} \resN{\wh^i(G)} \r|
+			\leq (1-\varepsilon)^n \cdot |K| \text{ for some } n \in \N \]
+		\textbf{Inductive step}:	%%% REDO
+		\begin{align*}
+		 & \pair{K, G} \in R \\
+		 & \explain{Lemma~\ref{lem:bisim:iteration}} \\
+		\implies & \pair{K - \sum_{i=1}^{n+1} \resN{\wh^i(G)}, \wh^n(G)} \in R \\
+		 & \explain{Property iii) of strong bisimulations} \\
+		\implies & \l| \resN{ \wh\l( \wh^n(G) \r) } \r|
+			 \geq \varepsilon \cdot \l| K - \sum_{i=1}^{n} \resN{\wh^i(G)} \r| \\
+		 & \explain{negate, add to both sides} \\
+		\implies & \l( |K| - \l| \sum_{i=1}^{n} \resN{\wh^i(G)} \r| \r)
+			- \l| \resN{ \wh^{n+1}(G) } \r| \\
+		 & \leq  \l( |K| - \l| \sum_{i=1}^{n} \resN{\wh^i(G)} \r| \r)
+			- \varepsilon \cdot
+			\l( |K| - \l| \sum_{i=1}^{n} \resN{\wh^i(G)} \r| \r) \\
+		 & \explain{merge sums, factor out} \\
+		\implies & |K| - \l| \sum_{i=1}^{n+1} \resN{\wh^i(G)} \r|
+			\leq (1-\varepsilon) \cdot 
+			\l( |K| - \l| \sum_{i=1}^{n} \resN{\wh^i(G)} \r| \r) \\
+		 & \explain{induction hypothesis} \\
+		\implies & |K| - \l| \sum_{i=1}^{n+1} \resN{\wh^i(G)} \r|
+			\leq (1-\varepsilon) \cdot (1-\varepsilon)^n \cdot |K|
+			= (1-\varepsilon)^{n+1} \cdot |K| \\
+		\end{align*}
+	\end{proof}
+\end{lemma}
+
+\begin{lemma}
+	\label{lem:leq_and_mass_impl_equality}
+	Let $G$ and $G'$ be PGFs of $k$ variables with coefficients $\mu_s$ and $\mu_s'$ for $s \in \Z^k$, respectively. Then
+	$$ G \leqD G' \ \land \ |G| = |G'| \implies G = G' $$
+	\begin{proof}
+		Let $G$ and $G'$ be PGFs as above such that $G \leqD G'$ and $|G| = |G'|$.
+		Now assume $G \ne G'$.
+		Then there exists $s \in \Z^k$ with $\mu_s \ne \mu_s'$.
+		Since $G \leqD G'$ it follows that $\mu_s < \mu_s'$.
+		Adding all other coefficients on both sides does not break the inequation as every coefficient of $G$ is less or equal to the respective coefficient of $G'$.
+		Hence,
+		\[ |G| = \sum_{s \in \Z^k} \mu_s < \sum_{s \in \Z^k} \mu_s' = |G'| \]
+		This is a contradiction to the precondition, so $G = G'$.
+	\end{proof}
+\end{lemma}
+
+\begin{theorem}[continues=theo:bisim:loopsmtx, label=proof:bisim:loopsmtx]
+	Let $B$ be a Boolean condition, $P$ a program and $R$ a strong bisimulation for $B$ and $P$ with constant $\varepsilon$. Then
+	\[ \pair{K, G} \in R \land G \models B \implies K = \smtx{\while{B}{P}}(G) \]
+	\begin{proof}
+		\begin{align*}
+		 & \pair{K, G} \in R \land G \models B \\
+		 & \explain{Lemma \ref{lem:bisim:iterateeps}} \\
+		\implies & |K| - \l| \sum_{i=1}^{n} \resN{\wh^i(G)} \r|
+			\leq (1-\varepsilon)^n \cdot |K|
+			\land \resN{wh^0(G)} = 0 \\
+		\implies & |K| - \l| \sum_{i=0}^{n} \resN{\wh^i(G)} \r|
+			\leq (1-\varepsilon)^n \cdot |K| \\
+		\implies & \lim_{n \to \infty}
+		\l( |K| - \l| \sum_{i=0}^{n} \resN{\wh^i(G)} \r| \r)
+		\leq \lim_{n \to \infty} (1-\varepsilon)^n \cdot |K| \\
+		\implies & \lim_{n \to \infty} \l| K \r| -
+		\lim_{n \to \infty} \l| \sum_{i=0}^{n} \resN{\wh^i(G)} \r|
+		\leq \lim_{n \to \infty} (1-\varepsilon)^n \cdot |K| \\
+		& \text{$a_n = \sum_{i=0}^{n} \resN{\wh^i(G)}$ is monotonic and bounded by its supremum given by the cpo $D$,} \\
+		& \text{so $a_n$ converges to its supremum.} \\
+		\implies & \lim_{n \to \infty} \l| K \r| -
+		\l| \sup_{n \in \N} \sum_{i=0}^{n} \resN{\wh^i(G)} \r|
+		\leq \lim\limits_{n \to \infty} (1-\varepsilon)^n \cdot |K| \\
+		\implies & \l| K \r| - \l| \smtx{\while{B}{P}}(G) \r| \leq 0 \\
+		\implies & \l| K \r| \leq \l| \smtx{\while{B}{P}}(G) \r|
+		\end{align*}
+		\\
+		Using this and Theorem \ref{theo:bisim:overapprox}, we get
+		\begin{align*}
+		& \pair{K, G} \in R \land G \models B \\
+		& \explain{apply Theorem \ref{theo:bisim:overapprox} and the previous result} \\
+		\implies & \smtx{\while{B}{P}}(G) \leqD K \land |K| \leq \l| \smtx{\while{B}{P}}(G) \r| \\
+		\implies & \l| \smtx{\while{B}{P}}(G) \r| \leq |K| \land
+		|K| \leq \l| \smtx{\while{B}{P}}(G) \r| \\
+		\implies & |K| = \l| \smtx{\while{B}{P}}(G) \r|
+		\end{align*}
+		To recap, from $\pair{K, G} \in R \land G \models B$ it follows that
+		\begin{itemize}
+			\item $\l| \smtx{\while{B}{P}}(G) \r| = |K|$ from above, and
+			\item $\smtx{\while{B}{P}}(G) \leqD K$ from Theorem \ref{theo:bisim:overapprox}.
+		\end{itemize}
+		These satisfy the precondition of Lemma \ref{lem:leq_and_mass_impl_equality},
+		which gives us the final result
+		\[ \pair{K, G} \in R \land G \models B
+			\implies K = \smtx{\while{B}{P}}(G) 		\qedhere \]
+	\end{proof}
+\end{theorem}

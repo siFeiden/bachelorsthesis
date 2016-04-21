@@ -1,0 +1,26 @@
+In this bachelor thesis, we developed a PGF semantics for probabilistic programs with integer program variable valuations.
+The semantics is based on semantic tuples which are tuples where each entry is a PGFs.
+The number of entries grows exponentially in the number of program variables.
+This means that for more than three or four program variables the tuples are hard to handle by hand because they have many entries.
+However, with some knowledge about the program we can reduce the number of entries that have to be calculated to find a complete semantic description.
+Another way to reduce complexity is to use PGFs with extended range.
+Every of these PGFs corresponds to a semantic tuple and can therefore be used as well.
+We successfully applied the new semantics to a variety of programs and could even extend the results of Gretz et al.\ concerning two equivalent programs.
+We showed that the programs are not only equal in expectation but indeed equal in their semantics.
+In the next step, we found a novel approach to prove the semantics of a loop.
+Originally, the loop semantics is defined as the sum of all possible loop unrollings.
+Now, we can also use binary relations called bisimulations.
+A bisimulation is a set of pairs of PGFs.
+Each pair is a pair of input and output of the loop that is treated.
+There are two types of bisimulations.
+Weak bisimulations allow to prove an overapproximation for the loop's semantics.
+Strong bisimulations can be used to prove that a pair in the bisimulation is in fact the input and output of the loop.
+Last, we showed that our PGF semantics is equivalent in expectation to the weakest preexpectation semantics introduced by McIver and Morgan.
+We proved that the execution of a program in either semantics has the same expected value for an arbitrary property expressed as a function over the program variables. \\
+In this thesis, we proved that two different programs are equal in their semantics.
+Instead of showing equivalence or nonequivalence of two programs, one could find a measure for the similarity of two programs.
+This can be done by comparing the semantics of these programs.
+In our case, this would require a distance function for PGFs.
+Another idea is to find more use cases and other statements that can be derived from weak and strong bisimulations.
+
+

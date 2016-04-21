@@ -1,0 +1,199 @@
+\subsection*{Introduction}
+In~\cite{arbab:coinduction}, Arbab et al.\ introduced the concept of \emph{coinduction}.
+Coinduction can be used to reason about sequences of numbers using relations called \emph{bisimulations}.
+Inspired by their ideas, we will introduce two methods that use relations of PGFs to reason about loop semantics.
+
+\begin{definition}[Weak Bisimulation]
+  Let $B$ be a Boolean condition and $P$ a program.
+  A \emph{weak bisimulation} for $B$ and $P$ is a binary relation $R \subseteq D \times D$ such that
+  for all $G$, $K \in D$, \\
+  if $\pair{K, G} \in R$, then
+  \begin{enumerate}[i)]
+    \item[] Let $G' = \wh(G)$
+    \item $\resN{G'} \leqD K$	\label{bisim:weak:prop1}
+    \item $\pair{K - \resN{G'}, G'} \in R$	\label{bisim:weak:prop2}
+  \end{enumerate}
+\end{definition}
+
+The definition for a weak bisimulation is an inductive one.
+Assume the pair $(K, G)$ of PGFs is an element of a bisimulation $R$.
+Using the property \ref{bisim:weak:prop2}, we can find another pair of PGFs that is also an element of $R$.
+Note that the first and second pair are not necessarily distinct.
+The entries $K$ and $G$ correspond to output and input of a loop.
+$K$ is a candidate for the semantics of a loop, $G$ is the loop's input.
+Recall the loop semantics:
+\[ \smtx{\while{B}{P}}(G) = \sum_{i=0}^{\infty}  \resN{\wh^i(G)} \]
+To get a statement about the loop semantics, we can repeatedly apply \ref{bisim:weak:prop2} to get new pairs of PGFs.
+In ii), the second entry of the new pair is $\wh(G)$.
+As we have seen before, $\wh$ applies the loop body $P$ once to its input.
+Hence, every application of ii) applies the loop body $P$ once to $G$.
+This means that applying ii) is similar to unrolling the loop once.
+In the first entry, $\resN{G'} = \resN{\wh(G)}$ is subtracted from $K$ in an application of ii).
+The subtractions cumulate with every application of ii) so that iterating ii) ad infinitum subtracts the semantics of the loop from $K$.
+Unfortunately, a weak bisimulation can only prove that $K$ is an overapproximation of the loop semantics.
+
+\begin{theorem}[label=theo:bisim:overapprox]
+	Let $B$ be a boolean condition, $P$ a program and $R$ a basic bisimulation. \\
+	Then \[ \pair{K, G} \in R \land G \models B
+		\implies \smtx{\while{B}{P}}(G) \leqD K \]
+	\begin{proof}
+		See Appendix~\ref{proof:bisim:overapprox}.
+	\end{proof}
+\end{theorem}
+
+Here, $G$ satisfies $B$ if the restriction $\resP{G}$ is the same as $G$:
+\[ G \models B \iff \resP{G} = G \iff \resN{G} = 0 \]
+In other words, every program state for which the corresponding coefficient is non-zero must satisfy the condition $B$.
+This part of the precondition restricts the loops we can handle to those where the input PGF satisfies the loop condition.
+In practice, many loops appearing have that property.
+For example, in all loops in the previous examples, their input PGF satisfies the loop condition. \\
+In a weak bisimulation, $K$ is an overapproximation for the loop semantics.
+The reason is that $\resN{\wh(G)}$ in property \ref{bisim:weak:prop2} may be 0.
+For example, $R_{0} = \{ (1, 0) \}$ is a valid weak bisimulation.
+Applying ii) gives again $(1, 0)$.
+There is no loop $P_W$ such that $\smtx{P_W}(0) = 1$ yet for all loops it holds that $\smtx{\while{B}{P}}(0) \leqD 1$.
+In order to prove that a pair $(K, G)$ in a bisimulation is in fact the output and input of a loop, we need to strengthen the definition of a weak bisimulation by another property.
+
+\begin{definition}[Strong Bisimulation]
+	Let $B$ be a boolean condition and $P$ a program.
+	An \emph{advanced bisimulation} for $B$ and $P$ is a binary relation $R \subseteq D \times D$
+	that is a basic bisimulation with one additional property.
+	For all $G, K \in D$ and a constant $\varepsilon \in (0, 1)$, if $\pair{K, G} \in R$, then
+	\begin{enumerate}[i)]
+		\item[] Let $G' = \wh(G)$
+		\item $\resN{G'} \leqD K$	\label{bisim:strong:prop1}
+		\item $\pair{K - \resN{G'}, G'} \in R$	\label{bisim:strong:prop2}
+		\item $\left| \resN{G'}\right| \geq \varepsilon \cdot \l| K \r|$\label{bisim:strong:prop3}
+	\end{enumerate}
+\end{definition}
+
+The strong bisimulation introduces a constant $\varepsilon$ which is the same all over $R$.
+This means that we cannot choose $\varepsilon$ after every application of \ref{bisim:strong:prop2}.
+$\varepsilon$ must be in the interval $(0, 1)$ so that the first and third properties can never contradict:
+\ref{bisim:strong:prop1} implies $|\resN{G'}| \leq |K|$.
+With $\varepsilon$ chosen greater than 1, this would be a contradiction to \ref{bisim:strong:prop3}. \\
+Of course, a strong bisimulation is also a weak bisimulation because it satisfies properties \ref{bisim:weak:prop1} and \ref{bisim:weak:prop2}.
+The third property iii) prevents the problem we had with weak bisimulations.
+It guarantees that $K$ is strictly decreased in every application of ii).
+In consequence, a pair $(K, G)$ in a strong bisimulation is a pair of output and input of a loop.
+
+\begin{theorem}[label=theo:bisim:loopsmtx]
+	Let $B$ be a boolean condition, $P$ a program and $R$ a strong bisimulation for $B$ and $P$ with constant $\varepsilon$. Then
+	\[ \pair{K, G} \in R \land G \models B \implies K = \smtx{\while{B}{P}}(G) \]
+	\begin{proof}
+		See Appendix~\ref{proof:bisim:loopsmtx}.
+	\end{proof}
+\end{theorem}
+
+
+\subsection*{Case study}
+\begin{figure}[t]
+	\begin{lstlisting}[label=prg:canonical3, caption=Canonical example]
+X := 0
+F := 0
+while (F = 0) {
+  {X := X + 1}[0.5]{F := 1}
+}
+	\end{lstlisting}
+	\caption{A probabilistic program. \label{fig:canonical}}
+\end{figure}
+As an example, we will find a bisimulation for the program in Figure~\ref{fig:canonical}.
+Define $B = ( F = 0 )$ as the loop condition and $P = \{X := X + 1\}[0.5]\{F := 1\}$ as the loop body.
+The input of the loop is $G = 1$.
+The loop's output is $K := \hf \cdot \sum_{i=0}^\infty \half^i X^{i} F^1$, as we have seen in Section~\ref{ssec:canonical_examples}.
+We now want to apply the previous theorem to the loop.
+To do so, we define a relation $R$ such that $\pair{K, G}$ is an element of $R$ and prove that $R$ is a strong bisimulation.
+\[
+	R = \{ (K, G) \} \cup \l\{ \pair{ \hf \cdot \sum_{i=n}^\infty \half^i X^i F^1 ,
+	  	\half^n X^n F^0 + \half^n X^{n-1} F^1 }
+		\, \middle|\, n \in \N_{>0} \r\}
+\]
+Apparently, $\pair{K, G}$ is an element of $R$, so the pair of output and input of the loop are in $R$.
+It remains to prove that $R$ is a strong bisimulation.
+\begin{proof}
+	We have to show the properties~\ref{bisim:strong:prop1},~\ref{bisim:strong:prop2} and~\ref{bisim:strong:prop3} for every element of $R$.
+	We do this by showing them once for $\pair{K, G}$ and then for every $n > 0$.
+	During the proof, we will also have to find a value for $\varepsilon$.
+	\begin{itemize}
+		\item Property i) for $(K, G)$:
+			\begin{align*}
+				\resN{ \wh(G) } & = \resN{ \hf X^1 F^0 + \hf X^0 F^1} = \hf X^0 F^1 \\
+				& \leqD \hf X^0 F^1 + \frac{1}{4} X^1 F^1 + \frac{1}{8} X^2 F^1 + \ldots \\
+				&= K
+			\end{align*}
+		\item Property ii) for $(K, G)$:
+			\begin{align*}
+				 & \pair{K - \resN{ \wh(G) }, \wh(G)} \\
+				=& \pair{K - \hf X^0 F^1, \hf X^1 F^0 + \hf X^0 F^1} \\
+				=& \pair{ \hf \cdot \sum_{i=1}^{\infty} \half^i X^i F^1,
+					\hf X^1 F^0 + \hf X^0 F^1} \\
+				& \in R \text{ for } n = 1
+			\end{align*}
+		\item Property iii) for $(K, G)$:
+			\begin{align*}
+				& \l| \resN{ \wh(G) } \r| = \l| \hf X^0 F^1 \r| = \hf \\
+				\text{and } & |K| = \l| \hf \cdot \sum_{i=0}^\infty \half^i X^{i} F^1 \r|
+					= \hf \cdot \sum_{i=0}^\infty \half^i = 1 \\
+				\implies & \l| \resN{ \wh(G) } \r| = \hf \geq \varepsilon \cdot 1 = |K|
+					\text{ for } \varepsilon = \hf
+			\end{align*}
+	\end{itemize}
+	In the proof for property iii), we chose $\varepsilon = \hf$.
+	We will have to use the same value for the remaining cases or find a new value that fits all cases.
+	\begin{itemize}
+		\item Property i) for any $n > 0$:
+			\begin{align*}
+				& \resN{ \wh\l( \half^n X^n F^0 + \half^n X^{n-1} F^1 \r) } \\
+				=&  \resN{ \half^{n+1} X^{n+1} F^0 + \half^{n+1} X^n F^1 } \\
+				=& \half^{n+1} X^n F^1 \\
+				\leqD& \half^{n+1} X^n F^1 + \half^{n+2} X^{n+1} F^1 + \ldots \\
+				=& \hf \cdot \sum_{i=n}^{\infty} \half^i X^i F^1
+			\end{align*}
+		
+		\item Property ii) for any $n > 0$:
+			First of all, let
+			\begin{align*}
+				G_{n+1} &:= \wh\l( \half^n X^n F^0 + \half^n X^{n-1} F^1 \r) \\
+				&= \half^{n+1} X^{n+1} F^0 + \half^{n+1} X^n F^1
+			\end{align*}
+			$G_{n+1}$ appears in both entries of the tuple in property ii):
+			\begin{align*}
+				 & \pair{ \hf \cdot \sum_{i=n}^{\infty} \half^i X^i F^1
+				  	- \resN{ G_{n+1} } , G_{n+1} } \\
+				=& \pair{ \hf \cdot \sum_{i=n}^{\infty} \half^i X^i F^1
+				 	- \half^{n+1} X^n F^1 , G_{n+1} } \\
+				=& \pair{ \hf \cdot \sum_{i=n+1}^{\infty} \half^i X^i F^1,
+					\half^{n+1} X^{n+1} F^0 + \half^{n+1} X^n F^1 } \\
+				 & \in R \text{ for } n + 1
+			\end{align*}
+		
+		\item Property iii) for any $n > 0$:
+			For the first entries of elements in $R$, the following holds:
+			\begin{align*}
+				& \l| \hf \cdot \sum_{i=n}^{\infty} \half^i X^i F^1 \r| \\
+				=& \hf \cdot \sum_{i=n}^{\infty} \half^i \\
+				=& \hf \cdot \l( \sum_{i=0}^{\infty} \half^i
+					- \sum_{i=0}^{n-1} \half^i \r) \\
+				=& \half^n
+			\end{align*}
+			For the second entries, we derive the following:
+			\begin{align*}
+				& \l| \resN{ \wh\l( \half^n X^n F^0 + \half^n X^{n-1} F^1 \r) } \r| \\
+				=& \l| \half^{n+1} X^n F^1 \r| \\
+				=& \half^{n+1}
+			\end{align*}
+			We see that for $\varepsilon = \frac{1}{2}$ the property is satisfied.
+			Note that we do not have to change the value of $\varepsilon$ that we chose earlier.
+			\begin{align*}
+				& \l| \resN{\wh(\wh^n(G))} \r| \\
+				=& \half^{n+1} \geq \varepsilon \half^n \\
+				=& \l| \sum_{i=n}^\infty \resN{\wh^i(G)} \r|		\qedhere
+			\end{align*}
+	\end{itemize}
+\end{proof}
+We have shown that $R$ is a strong bisimulation for $B$ and $P$.
+Since $G \models B$, we can apply Theorem \ref{theo:bisim:overapprox} and Theorem~\ref{theo:bisim:loopsmtx} to the loop from above.
+The first thing we get is:
+\[ \smtx{\while{B}{P}}(G) \leqD K \]
+and secondly, the stronger version:
+\[ \smtx{\while{B}{P}}(G) = K \]

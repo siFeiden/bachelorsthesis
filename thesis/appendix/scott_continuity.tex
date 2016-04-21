@@ -1,0 +1,17 @@
+\begin{lemma}[continues=lem:ext:scottcontinuous]
+	Let $B$ be a Boolean condition and $P$ be a program.
+	Then \[ \hh(f)(G) = \resN{G} + f \l( \wh(G) \r) \text{ is Scott-continuous.} \]
+	\begin{proof}
+		Let $f_1 \leqL f_2 \leqL f_3 \leqL \ldots$ be an $\omega$-chain in $L$.
+		To show the Scott-continuity of $\hh$, it suffices to prove that
+		\[ \hh\l( \sup_{n \in \N} \{ f_n \} \r) = \sup_{n \in \N} \l\{ \hh(f_i) \r\} \]
+		Starting with the left hand side of the equation, we complete the proof.
+		\begin{align*}
+			 & \hh\l( \sup_{n \in \N} \{ f_n \} \r) \\
+			=& \lambda G. \resN{G} + \l( \sup_{n \in \N} \{ f_n \} \r) ( \smtx{P}(\resP{G}) ) \\
+			=& \lambda G. \resN{G} + \sup_{n \in \N} \{ f_n ( \smtx{P}(\resP{G}) ) \} \\
+			=& \sup_{n \in \N} \l\{ \lambda G. \resN{G} + f_n \l( \smtx{P}(\resP{G}) \r) \r\} \\
+			=& \sup_{n \in \N} \{ \hh(f_n) \}		\qedhere
+		\end{align*}
+	\end{proof}
+\end{lemma}

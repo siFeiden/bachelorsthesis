@@ -1,0 +1,277 @@
+\begin{figure}[t]
+	\begin{minipage}[t]{0.5\textwidth}
+		\begin{lstlisting}[label=prg:canonical, caption=Canonical example]
+X := 0;
+F := 0;
+while ( F = 0 ) {
+  { X := X + 1 }[0.5]{ F := 1 }
+}
+		\end{lstlisting}
+	\end{minipage}
+	\begin{minipage}[t]{0.5\textwidth}
+		\begin{lstlisting}[label=prg:canonical_neg, caption=Inverse canonical example]
+X := 0;
+F := 0;
+while ( F = 0 ) {
+  { X := X - 1 }[0.5]{ F := 1 }
+}
+		\end{lstlisting}
+	\end{minipage}
+	\caption{Two simple probabilistic programs. \label{fig:canonicals}}
+\end{figure}
+
+Having introduced a probabilistic programming language and an associated semantics, we now want to extend that semantics so that variables can also have negative valuations.
+But first, let us have a look at why this is beneficial.
+Even simple programs like $X := -1$ are not representable in the previous semantics because $X$ is assigned a negative value.
+This might be a contrived example but for instance, every subtraction that is used in a program must be checked by hand to never have a negative result.
+Consider Listings~\ref{prg:canonical} and~\ref{prg:canonical_neg} in Figure \ref{fig:canonicals}.
+The first one is perfectly expressible in the semantics while the latter is not, although only a single operation was changed from $+$ to $-$. \\
+We will improve on this by defining a new semantics that allows negative variable evaluations.
+Additionally, the new semantics should also support closed forms.
+The first is to simply extend the range of the PGFs from $\N^k$ to $\Z^k$, i.e.
+\[ G = \sum_{s \in \Z^k} s X_1^{s_1} \cdots X_k^{s_k} \]
+Those are still PGFs, but they no longer form a ring, because multiplication is not well-defined for every pair of PGFs with extended range.
+Unfortunately, a ring is necessary for closed forms to be well-defined, so we cannot use PGFs with extended range for the new semantics.
+A solution to the problem is as follows:
+Given $k$ program variables, the set $\S$ of all possible variable evaluations, called \emph{state space}, is $\S = \Z^k$.
+We will partition $\S$ into sets $S_1, \ldots, S_{2^k}$ such that every program variable $X_j$ always has the same sign in every state in $S_j$.
+For example, if a program has 1 variable, so $k = 1$, then the state space $\S = \Z$.
+The two partitions are 
+\begin{align*}
+	S_1 &= \N \\
+	S_2 &= \Z \setminus \N = \{ -1, -2, \ldots \} =: -\N^*
+\end{align*}
+If a program has 2 variables, $\S = \Z^2$ and the 4 partitions are
+\begin{alignat*}{5}
+	S_1 = &&  \N \phantom{*}	\times &&  \N \phantom{*}	\\
+	S_2 = && -\N^*				\times &&  \N \phantom{*}	\\
+	S_3 = &&  \N \phantom{*}	\times && -\N^*				\\
+	S_4 = && -\N^*				\times && -\N^*
+\end{alignat*}
+In the general case with $k > 0$ variables,
+\[ S_j = \bigtimes_{i=0}^k
+	\begin{cases}
+		\phantom{-} \N & \text{if } b(j)_i = 0 \\
+		-\N^* & \text{otherwise}
+	\end{cases}
+   \where 1 \leq j \leq 2^k \]
+where $\bigtimes$ is the generalised cartesian product and $b(j)$ is the $j$-th element for some enumeration $b \colon \{1, \ldots, 2^k \} \to \{0, 1\}^k$.
+As $b(j)$ is an element of a cartesian product, it is a tuple.
+Thus, $b(j)_i$ is simply the $i$-th entry of $b(j)$.
+$\{0, 1\}^k$ has $2^k$ elements, just as many as there are partitions.
+The $i$th entry of a tuple in $\{0, 1\}^k$ determines if the program variable $X_i$ is negative or positive in the corresponding partition. \\
+Having partitioned the state space, we can now introduce the new semantics.
+It consists of tuples which have an entry for every partition of the state space.
+Every entry of such a tuple is a multivariate formal power series with its range being the corresponding partition.
+\begin{definition}[Semantic Tuple]
+	Let $P$ be a program of $k$ variables.
+	A \emph{semantic tuple} $T_G$ is an object of the form
+	\[ T_G = \l( \sum_{s \in S_1} \mu_s \Xok, \ldots,
+		\sum_{s \in S_{2^k}} \mu_s \Xok \r) \]
+\end{definition}
+Because we are using multivariate formal series which have closed forms, we can use them in the entries of the tuples.
+Let us look at an example using the following program $P$.
+\begin{lstlisting}
+X := 0;
+{ X := -9 }[0.6]{ X := 9 }
+\end{lstlisting}
+$P$ has one variable, so the semantic tuples have two entries.
+The first entry contains the part where $X$ is positive and the second entry the part where $X$ is strictly negative.
+After executing the program, $X$ has value $-9$ with probability $0.6$ and value 9 with probability $0.4$.
+A corresponding semantic tuple $T_G$ in the semantics is
+\[ T_G = ( 0.4 X^9, 0.6 X^{-9} ) \]
+Unfortunately, the semantics becomes unwieldy when dealing with many variables, because the number of entries grows exponentially in the number of variables.
+With three variables the tuples have eight entries and with four variables they have sixteen entries.
+Handling sixteen or more entries is not convenient when calculating a semantics by hand.
+To avoid this problem, we can fall back to using formal power series with an extended range.
+\begin{theorem}
+	Every PGF with extended range
+	\[ G = \sum_{s \in \Z^k } \mu_s \Xok \]
+	corresponds to the semantic tuple
+	\[ T_G = \l( \sum_{s \in S_1} \mu_s \Xok, \ldots, \sum_{s \in S_{2^k}} \mu_s \Xok \r) \]
+\end{theorem}
+Every $G$ is easily decomposable into entries of a semantic tuples.
+Furthermore, the extended FPSs can be added and scaled, just as the normal PGFs.
+\begin{theorem}[label=theo:ext:vectorspace]
+	The set of FPSs with extended range combined with addition and scalar multiplication forms a \emph{vector space}.
+	\begin{proof}
+		See Appendix~\ref{proof:vector_space}.
+	\end{proof}
+\end{theorem}
+The semantics only needs these two operations to be defined, so we do not lack any expressive power from using them.
+In consequence, we can use them to simplify the notation of the semantics when dealing with many variables.
+Additionally, the entries of the semantics tuples are not always non-zero.
+Consider the examples in Figure \ref{fig:canonicals}.
+All of them contain a variable $F$ that is only ever assigned the value 0 or 1, so $F$ is always positive.
+The entries where $F$ is negative are therefore 0, so they do not have to be considered when calculating a semantics.
+
+\subsection{Programs without Loops}
+Having defined objects that can model the whole state space, we can now go on to define what happens to them during the execution of a program.
+First, we will treat programs without loops because their semantics is straightforward while the semantics for loops requires some more work.
+We will adopt the notation that $\smtx{P}$ is the semantics function corresponding to $P$.
+
+\subsubsection*{Basic operations}
+\begin{enumerate}
+	\item $\smtx{\nop}(G) = G$
+	\item $\smtx{\abort}(G) = 0 = \sum\limits_{s \in \Z^k} 0 \Xok$
+	\item $\smtx{X_j := e}(G) = \sum\limits_{s \in \Z^k} \mu_s X_1^{s_1} \cdots X_j^{e(s)} \cdots X_k^{s_k}$
+\end{enumerate}
+\subsubsection*{Composite operations}
+Here, $P, P_1$ and $P_2$ are programs and $B$ is a Boolean condition.
+\begin{enumerate}
+	\item $\smtx{P_1; P_2}(G) = \smtx{P_2}( \smtx{P_1}(G) )$
+	\item $\smtx{ \{P_1\}[p]\{P_2\} }(G)
+		= p \cdot \smtx{P_1}(G) + (1-p) \cdot \smtx{P_2}(G)$ \\
+		Note that both operations of the vector space are used.
+	\item $\resP{\sum\limits_{s \in \Z^k} \mu_s \Xok} =
+		\sum\limits_{s \in \Z^k}\begin{cases}
+		\mu_s \Xok & \text{ if } s \models B \\
+		0 & \text{ otherwise}
+	\end{cases}$
+	\item $\smtx{\ifp{B}{P_1}{P_2}}(G) = \smtx{P_1}(\resP{G}) + \smtx{P_2}(\resN{G})$
+\end{enumerate}
+
+\subsection{Domains}
+
+We now want to define the semantics of a loop $\while{B}{P}$.
+As has been done before in \cite{denHartog:verifying_prob_progs} and \cite{gretz:wp_semantics}, we will treat the loop semantics as the least fixed point of a function on an \emph{$\omega$-complete partial order}, also called \emph{domain}.
+For the loop semantics, we need two $\omega$-complete partial orders, one containing all PGFs and the other all PGF-transformers. \\
+An $\omega$-complete partial order~\cite{winskel:cpos} is a set equipped with a relation $\sqsubseteq$ which is a \emph{partial order} and has a completeness property:
+$(P, \sqsubseteq)$ is a partial order if and only if $\sqsubseteq$ is reflexive, antisymmetric and transitive.
+$(P, \sqsubseteq)$ is $\omega$-complete if every infinitely ascending chain $d_1 \sqsubseteq d_2 \sqsubseteq \ldots \in P$ has a supremum.
+
+\begin{definition}
+	The set $D_k$ is the set of all PGFs of $k$ variables whose coefficients and absolute value lie in the range $[0, 1]$.
+	\[ D_k = \l\{ \sum_{s \in \Z^k} \mu_s \Xok \middle|
+		\forall s \in \Z^k \colon \mu_s \in [0, 1]
+		\land \sum_{s \in \Z^k} \mu_s \in [0,1] \r\} \]
+	The set $L_k$ is the set of all functions from $D_k$ to $D_k$.
+	\[ L_k = \l\{ D_k \to D_k \r\} \]
+We equip the sets $D_k$ and $L_k$ with the following relations:
+\begin{itemize}
+	\item $d \sqsubseteq_{D_k} d' \iff \forall s \in \Z^k \colon \mu_s \leq \mu_s'$ \\
+		A PGF $d$ is less than or equal to another PGF $d'$ iff every coefficient of $\Xok$ in $d$ is less than or equal to the corresponding coefficient in $d'$.
+	\item $f \sqsubseteq_{L_k} g \iff \forall d \in D_k \colon f(d) \sqsubseteq_{D_k} g(d)$ \\
+		A PGF transformer is less than or equal to another iff it is pointwise less than or equal for all elements of $D_k$.
+\end{itemize}
+\end{definition}
+In the remaining thesis, we will leave out the index $k$ of $D_k$ and $L_k$ if $k$ is clear from context.
+
+\begin{lemma}[label=lem:ext:cpos]
+	$D_k$ and $L_k$ are $\omega$-complete partial orders.
+	\begin{proof}
+		See Appendix \ref{proof:cpos}.
+	\end{proof}
+\end{lemma}
+Before we continue, we take a closer look at the sets $D$ and $L$.
+Consider an element of $D$.
+Elements in $D$ are restricted to having their absolute value and all coefficients between zero and one.
+Each of its coefficients is the probability that the corresponding program state appears.
+Neither of these probabilities can be more than one or less than zero, so these restrictions do not exclude any programs or PGFs we could use for describing actual programs. \\
+Elements in $L$ are functions from PGF to PGF.
+Every program transforms an initial PGF into its result.
+This means that all programs must correspond to an element in $L$: $\smtx{P} \in L$.
+
+\subsection{Programs with Loops}
+\label{sec:loop_semantics}
+Having introduced the two $\omega$-complete partial orders $D$ and $L$, we can go on defining the loop semantics $\smtx{P_W}$ of a loop $P_W = \while{B}{P}$.
+To do so, we define two functions.
+The first one is $\wh$ and it is defined as follows:
+\begin{align*}
+	& \wh \colon D \to D \\
+	& \wh(G) = \smtx{P}(\resP{G}) \\
+\end{align*}
+$\wh$ applies the loop body once after restricting its argument to the loop condition.
+This corresponds to the decision if the loop body should be executed once more or not.
+$\wh$ chooses the parts that satisfy the condition and applies another iteration to them.
+We will later see that the remaining part $(\resN{G})$ will form the semantics of the loop.
+We use $\wh$ very often in the remaining thesis.
+It always occurs in combination with a loop.
+In this case, if not stated otherwise, the index $B$ will correspond to the loop condition and $P$ to the loop body. \\
+The second function is $\hh$:
+\begin{align*}
+	& \hh \colon L \to L, \\
+	& \hh(f)(G) = \resN{G} + f \l( \wh(G) \r)
+\end{align*}
+As for $\wh$, the indices $B$ and $P$ of $\hh$ also correspond to the loop condition and loop body, respectively.
+Remember that $L$ contains the set of all semantics functions of all programs.
+$\hh$ is a map on $L$, so it basically transforms programs.
+In fact, $\hh$ acts like a single iteration of the loop $P_W$ to its argument.
+The loop body $P$ is executed once unless the condition $B$ does not hold.
+In this case, nothing is done.
+We can see that if we apply $\hh$ to a program $P'$:
+\begin{align*}
+	 & \hh( \smtx{P'} )(G) \\
+	 & \explain{definition of $\hh$} \\
+	=& \resN{G} + \smtx{P'} \l( \wh(G) \r) \\
+	 & \explain{definition of $\wh$} \\
+	=& \resN{G} + \smtx{P'} \l( \smtx{P} \l( \resP{G} \r) \r) \\
+	 & \explain{concatenation of programs} \\
+	=& \resN{G} + \smtx{P; P'}( \resP{G} ) \\
+	 & \explain{$\smtx{\nop}$ is the identity function} \\
+	=& \smtx{\nop}( \resN{G} ) + \smtx{P; P'}( \resP{G} ) \\
+	 & \explain{\textit{if} semantics} \\
+	=& \smtx{ \ifp{B}{P; P'}{\nop} }(G)
+\end{align*}
+Iterating $\hh$ will mimic the behaviour of the loop $P_W$ by unrolling the loop body.
+For example, applying $\hh$ twice gives
+\[ \hh^2(\smtx{P'}) = \smtx{ \ifp{B}{P; \ifp{B}{P; P'}{\nop}}{\nop} } \]
+which is the second unrolling of $P_W$.
+If we unroll $\hh$ ad infinitum, we get a program equivalent to the loop $P_W$.
+In this case, unrolling ad infinitum is equivalent to taking the least fixed point of $\hh$.
+We can find the least fixed point of $\hh$ using Kleene's fixed point theorem.
+\begin{theorem}[Kleene's Fixed Point Theorem~\cite{lassez:kleene_fixed_point}]
+	Every Scott-continuous function $F$ over an $\omega$-complete partial order has a least fixed point which is $\sup_{n \in \N} \{ F^n(\bot) \}$.
+	$\bot$ is the bottom element of the partial order.
+\end{theorem}
+To apply the theorem, we need to show that $\hh$ is Scott-continuous.
+\begin{lemma}[label=lem:ext:scottcontinuous]
+	Let $B$ be a Boolean condition and $P$ be a program.
+	Then \[ \hh(f)(G) = \resN{G} + f \l( \wh(G) \r) \text{ is Scott-continuous.} \]
+	\begin{proof}
+		See Appendix~\ref{proof:scott_continuity}
+	\end{proof}
+\end{lemma}
+$\hh$ satisfies the preconditions of the theorem and we get the least fixed point $F$
+\[ F = \sup_{n \in \N} \l\{ \hh^n(\bot) \r\} \]
+$\bot$ is the bottom element of $L$.
+It is the least element according to $\leqL$.
+$\leqL$ is defined pointwise using $\leqD$, so $\bot$ must always yield the least PGF, which is $0$.
+Hence, \[ \bot(G) = \sum_{s \in \Z^k} 0 \Xok \]
+$\hh$ applies iterations of the loop $P_W$ to its argument,
+so $F$ is the semantics of the whole loop.
+\begin{definition}[Loop Semantics]
+	Let $B$ be a Boolean condition and $P$ a program. The semantics of the loop $\while{B}{P}$ is given by
+	\[ \smtx{\while{B}{P}} = F = \sup_{n \in \N} \l\{ \hh^n(\bot) \r\} \]
+\end{definition}
+We now have a first characterisation of the semantics of $P_W$.
+$\smtx{P_W}$ is the fixed point of unrolling the loop.
+Finding suprema by hand or software can be difficult, so we will go on to find more characterisations of $\smtx{P_W}$.
+A closed form of $\hh^n(\bot)$ is a first step.
+\begin{lemma}[label=lem:ext:closedformhh]
+	Let $B$ be a Boolean condition and $P$ a program.
+	Then
+	\begin{align*}
+		& \hh^n(\bot)(G) = \sum_{i = 0}^{n-1} \resN{\wh^i(G)} \\
+		& \text{where } \wh(G) = \smtx{P}(\resP{G}) \text{ as defined above}.
+	\end{align*}
+	\begin{proof}
+		See Appendix~\ref{proof:closed_form_of_hh}.
+	\end{proof}
+\end{lemma}
+We now have another form for $\hh$ and can express the loop semantics in another way.
+\[ \smtx{\while{B}{P}}(G)
+	= \sup_{n \in \N} \l\{ \lambda G. \sum_{i = 0}^{n-1} \resN{\wh^i(G)} \r\}(G) \]
+Let us have a look at the sum inside the supremum.
+Each of its summands is a PGF with non-negative coefficients.
+Since PGFs are added coefficientwise, the coefficient of the whole sum for any $s \in \Z^k$ must keep increasing with $n$ going to infinity.
+The supremum over all $n$ of these sums must therefore be the infinite series.
+\begin{theorem}[label=theo:ext:whilesmtx]
+	Let $B$ be a Boolean condition and $P$ a program.
+	Then \[ \smtx{\while{B}{P}}(G) = \sum_{i = 0}^{\infty} \resN{\wh^i(G)} \]
+	\begin{proof}
+		See Appendix \ref{proof:series_for_while}.
+	\end{proof}
+\end{theorem}
+The loop semantics is expressible as an infinite series of PGFs.
+Series are well understood and there is a fair amount of tools to deal with them.

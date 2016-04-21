@@ -1,0 +1,117 @@
+$D_k$ was defined as the set of all PGFs over $k$ variables with its coefficients and absolute value in $[0,1]$.
+$L_k$ is the set of all functions mapping $D_k$ to $D_k$.
+To show that $D_k$ and $L_k$ are $\omega$-complete partial orders~\cite{winskel:cpos}, we have to show the following:
+\begin{enumerate}
+	\item $D_k$ and $L_k$ are reflexive.
+	\item $D_k$ and $L_k$ are transitive.
+	\item $D_k$ and $L_k$ are antisymmetric.
+	\item Every $\omega$-chain in $D_k$ or $L_k$ has a supremum.
+\end{enumerate}
+\begin{lemma}[continues=lem:ext:cpos]
+	$D_k$ is an $\omega$-complete partial order for all $k \in \N \setminus \{0\}$.
+	\begin{proof}
+		In the following, let $r, s$ and $t$ be arbitrary elements in $D_k$ with their coefficients $\rho_i, \sigma_i$ and $\tau_i$ for $i \in \Z^k$.
+		\begin{enumerate}
+			\item $\forall i \in \Z^k \colon \rho_i \leq \rho_i \iff r \leqD r$
+			
+			\item Assume $r \leqD s$ and $s \leqD t$.
+			Then \begin{align*}
+				& \forall i \in \Z^k \colon \rho_i \leq \sigma_i \land
+					\forall i \in \Z^k \colon \sigma_i \leq \tau_i \\
+				\implies & \forall i \in \Z^k \colon \rho_i \leq \sigma_i
+					\land \sigma_i \leq \tau_i \\
+				\implies & \forall i \in \Z^k \colon \rho_i \leq \tau_i \\
+				\implies & r \leqD t
+			\end{align*}
+			
+			\item Assume $r \leqD s$ and $s \leqD r$.
+			Then \begin{align*}
+				& \forall i \in \Z^k \colon \rho_i \leq \sigma_i \land
+				\forall i \in \Z^k \colon \sigma_i \leq \rho_i \\
+				\implies & \forall i \in \Z^k \colon \rho_i \leq \sigma_i
+					\land \sigma_i \leq \rho_i \\
+				\implies & \forall i \in \Z^k \colon \sigma_i = \rho_i \\
+				\implies & r = t
+			\end{align*}
+			
+			\item Note: Because of the  various subscripts, only in this fourth item, we will denote the coefficient of a PGF $G$ corresponding to $i \in \Z^k$ with $G(i)$. \\
+			Let $d_1 \leqD d_2 \leqD d_3 \leqD \ldots$ be an $\omega$-chain in $D_k$.
+			The coefficients of $d_n$ are now $d_n(i)$ for $i \in \Z^k$.
+			The supremum $d_{\sup}$ of the $\omega$-chain is given by
+			\[ d_{\sup}
+				= \sup_{n \in \N} \{d_n\}
+				= \sum_{i \in \Z^k} \sup_{n \in \N}
+				\l\{ d_n(i) \r\} X_1^{i_1} \cdots X_k^{i_k} \]
+			The supremum $\sup_{n \in \N} \{ d_n(i) \}$ exists because $d_n(i) \leq 1$ for all $i \in \Z^k$ by definition of $D_k$.
+			It remains to prove that $d_{\sup}$ is in fact the supremum of the $\omega$-chain.
+			\begin{enumerate}[i)]
+				\item \textit{$d_{\sup}$ is an upper bound for all $d_n$}. \\
+				Assume the contrary.
+				Then there is an index $n \in \N$ such that $d_{\sup} \sqsubsetneq_D d_n$.
+				Then there exists an $i \in \Z^k$ such that
+				$d_n(i) > d_{\sup}(i) = \sup_{n \in \N} \{ d_n(i) \}$.
+				This is a contradiction to the definition of supremum, so $d_{\sup}$ is an upper bound for all $d_n$.
+				
+				\item \textit{There is no $d'$ with $d_n \leqD d' \sqsubsetneq_D d_{\sup}$ for all $n \in \N$}. \\
+				Assume $d'$ exists.
+				Then there exists $i \in \Z$ such that $d_n(i) \leq d'(i) < d_{\sup}(i) = \sup_{n \in \N} \{ d_n(i) \}$.
+				This is a contradiction to the definition of supremum, so $d'$ cannot exist.
+			\end{enumerate}
+			By the items i) and ii) above, $d_{\sup}$ is the supremum of the $\omega$-chain.
+		\end{enumerate}
+		All four items above are proven, so $D_k$ is an $\omega$-complete partial order.
+	\end{proof}
+\end{lemma}
+
+\begin{lemma}
+	$L_k$ is an $\omega$-complete partial order for all $\N \setminus \{0\}$.
+	\begin{proof}
+		In the following, let $f, g$ and $h$ be arbitrary elements in $L_k$.
+		\begin{enumerate}
+			\item $D_k$ is reflexive, so $\forall d \in D_k \colon f(d) \leqD f(d)
+			\iff f \leqL f$.
+			
+			\item Assume $f \leqL g$ and $g \leqL h$.
+			Then \begin{align*}
+				& \forall d \in D_k \colon f(d) \leqD g(d) \land
+				\forall d \in D_k \colon g(d) \leqD h(d) \\
+				\implies & \forall d \in D_k \colon f(d) \leqD g(d) \land g(d) \leqD h(d) \\
+				& \explain{$D_k$ is transitive} \\
+				\implies & \forall d \in D_k \colon f(d) \leqD h(d) \\
+				& \explain{definition of $\leqL$} \\
+				\implies & f \leqL h
+			\end{align*}
+			
+			\item Assume $f \leqL g$ and $g \leqL f$.
+			Then \begin{align*}
+				& \forall d \in D_k \colon f(d) \leqD g(d) \land
+				\forall d \in D_k \colon g(d) \leqD f(d) \\
+				\implies & \forall d \in D_k \colon f(d) \leqD g(d) \land g(d) \leqD f(d) \\
+				& \explain{$D_k$ is antisymmetric} \\
+				\implies & \forall d \in D_k \colon f(d) = g(d) \\
+				\implies & f = g
+			\end{align*}
+			
+			\item Let $f_1 \leqL f_2 \leqL f_3 \leqL \ldots$ be an $\omega$-chain in $L_k$.
+			The supremum $l_{\sup}$ of the $\omega$-chain is given by
+			\[ l_{\sup}(d) = \sup_{n \in \N} \{ f_n(d) \} \]
+			The supremum on the the right hand side exists because $f_1(d) \leqD f_2(d) \leqD f_3(d) \leqD \ldots$ is an $\omega$-chain in $D_k$ for every $d \in D_k$.
+			It remains to prove that $l_{\sup}$ is in fact the supremum of the $\omega$-chain.
+			\begin{enumerate}[i)]
+				\item \textit{$f_{\sup}$ is an upper bound for all $f_n$}. \\
+				Assume the contrary.
+				Then there is an index $n \in \N$ such that $f_{\sup} \sqsubsetneq_L f_n$.
+				Then there exists a $d \in D_k$ such that
+				$f_n(d) \sqsupsetneq_L f_{\sup}(d) = \sup_{n \in \N} \{ f_n(d) \}$.
+				This is a contradiction to the definition of supremum, so $f_{\sup}$ is an upper bound for all $f_n$.
+				
+				\item \textit{There is no $f'$ with $f_n \leqL f' \sqsubsetneq_L f_{\sup}$ for all $n \in \N$}. \\
+				Assume $f'$ exists.
+				Then there exists $d \in D_k$ such that $f_n(d) \leqD f'(d) \sqsubsetneq_D f_{\sup}(d) = \sup_{n \in \N} \{ f_n(d) \}$.
+				This is a contradiction to the definition of supremum, so $f'$ cannot exist.
+			\end{enumerate}
+			By the items i) and ii) above, $f_{\sup}$ is the supremum of the $\omega$-chain.
+		\end{enumerate}
+		All four items above are proven, so $L_k$ is an $\omega$-complete partial order.
+	\end{proof}
+\end{lemma}

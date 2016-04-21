@@ -1,0 +1,16 @@
+\begin{center}
+\begin{minipage}[t]{0.8\textwidth}
+	\section*{Abstract}
+We present a semantics for a probabilistic programming language with program variables that can have values in the integers.
+The semantics is based on formal power series and is an extension to previous work of Scherbaum~\cite{clara:pgf}.
+Scherbaum's semantics does not allow program variables to have negative valuations.
+We define a semantic rule for each of the operations in the programming language.
+Loops are the most intricate operations.
+To ease finding a loop's semantics, we introduce a novel concept to obtain a statement about the semantics of a loop.
+It uses binary relations to either find the actual loop semantics or prove an overapproximation of the loop semantics.
+An element of such a relation is a pair of input and output of a loop.
+Later on, we prove that our semantics is equivalent in expectation to an already established one.
+For the comparison, we chose the weakest preexpectation semantics introduced by McIver and Morgan.
+We prove that the execution of a program in either semantics gives the same expected value for an arbitrary property expressed as a function over the program variables.
+\end{minipage}
+\end{center}

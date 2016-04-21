@@ -1,0 +1,333 @@
+Having introduced all elements of the semantics of our probabilistic language, we want to discuss several example programs.
+We will explain our semantics by applying it to each of the programs.
+All of the programs contain loops which are the most intricate language constructs.
+
+\subsection{Canonical Examples}
+\label{ssec:canonical_examples}
+
+\begin{figure}[t]
+	\begin{minipage}[t]{0.5\textwidth}
+		\begin{lstlisting}[caption=Canonical example]
+X := 0;
+F := 0;
+while ( F = 0 ) {
+  { X := X + 1 }[0.5]{ F := 1 }
+}
+		\end{lstlisting}
+	\end{minipage}
+	\begin{minipage}[t]{0.5\textwidth}
+		\begin{lstlisting}[caption=Inverse canonical example]
+X := 0;
+F := 0;
+while ( F = 0 ) {
+  { X := X - 1 }[0.5]{ F := 1 }
+}
+		\end{lstlisting}
+	\end{minipage}
+	\caption{Two simple probabilistic programs. \label{fig:canonicals2}}
+\end{figure}
+
+First, we will discuss the examples in Figure~\ref{fig:canonicals2}.
+They are very similar.
+Both contain a loop that runs as long as the variable $F$ has the value 0.
+In the loop body, either the variable $X$ is incremented/ decremented or $F$ is set to 1 so that the loop terminates.
+Recall the semantics of a loop $\while{B}{P}$:
+\[ \smtx{\while{B}{P}}(G) = \sum_{i = 0}^{\infty} \resN{\wh^i(G)} \]
+In the first program, we have
+\begin{itemize}
+	\item $B = (F = 0)$
+	\item $P = \l\{ X := X + 1 \r\}[0.5]\l\{ F := 1 \r\}$.
+	\item $G = 1$
+	\item $\wh(D) = \smtx{P}(\resP{D}) = \hf \smtx{X := X + 1}(\resP{D})
+		+ \hf \smtx{F := 1}(\resP{D})$.
+\end{itemize}
+The first step to finding the loop semantics is finding a closed form for $\resN{\wh^i(G)}$.
+After applying the loop body manually two or three times, one can generalise that
+\begin{align*}
+	& \resN{\wh^0(G)} = \resN{1} = 0 \\
+	& \resN{\wh^i(G)} = \half^i X^{i-1} F^1 \where i > 0
+\end{align*}
+We can verify this by an induction over $i$, see Appendix~\ref{proof:canonical_example}.
+To get the complete loop semantics, we have to sum up these terms for $i \in \N$.
+\begin{align*}
+	 & \smtx{\while{B}{P}}(G) \\
+	=& \resN{\wh^0 \l(1\r)} + \sum_{i = 1}^{\infty} \wh^i \l(1\r) \\
+	=& 0 + \sum_{i = 1}^{\infty} \half^i X^{i-1} F^1 \\
+	 & \explain{factor out $\hf$} \\
+	=& \hf \cdot \sum_{i = 1}^{\infty} \half^{i-1} X^{i-1} F^1 \\
+	 & \explain{transform indices} \\
+	=& \hf \cdot \sum_{i = 0}^{\infty} \half^i X^i F^1
+\end{align*}
+The semantics resulting from the loop is an infinite sum, where $X$ has value $i$ with probability $\half^{i+1}$.
+In fact, this is a geometric series and it has a closed form.
+\[ \smtx{\while{B}{P}}(G) = \hf \cdot \sum_{i = 0}^{\infty} \half^i X^i F^1 = \hf \cdot \frac{F}{1 - \hf X} = \frac{F}{2 - X} \]
+When we apply the absolute value, we can see that the loop terminates with probability 1.
+\[ \l| \smtx{\while{B}{P}}(G) \r|  = \l| \frac{F}{2 - X} \r| = 1 \]
+Having found the semantics for the first program, we can go on with the next one.
+Calculating the semantics for the second program yields a similar result.
+Instead of being incremented, the variable $X$ is decremented in the loop body.
+It will have negative values after more than one iteration of the loop.
+Again, we first find a closed form for $\resN{\wh^i(1)}$.
+In this case, it holds:
+\begin{align*}
+	& \resN{\wh^0 \l( G \r)} = \resN{1} = 0 \\
+	& \resN{\wh^i \l( G \r)} = \half^i X^{-i+1} F^1 \where i > 0
+\end{align*}
+The inductive proof is analogous to the one in Appendix~\ref{proof:canonical_example} for the previous example.
+Note that we have a negative exponent for $X$.
+To get the loop semantics, we again have to sum up all $\resN{ \wh^i \l(1\r) }$.
+\begin{align*}
+	 & \smtx{\while{B}{P}}(G) \\
+	=& \resN{\wh^0(G)} + \sum_{i = 1}^{\infty} \resN{\wh^i \l(G\r)} \\
+	=& 0 + \sum_{i = 1}^{\infty} \half^i X^{-i+1} F^1 \\
+	 & \explain{transform indices} \\
+	=& \sum_{i = 0}^{\infty} \half^{i+1} X^{-i} F^1 \\
+	 & \explain{factor out $\hf$} \\
+	=& \hf \cdot \sum_{i = 0}^{\infty} \half^i X^{-i} F^1
+%	=& \hf \cdot \frac{1}{1 - \hf X^{-1} F^1} \\
+%	=& \frac{F^1}{2 - X^{-1}}
+\end{align*}
+Again, the loop semantics is a geometric series with a closed form.
+\[ \smtx{\while{B}{P}}(G) = \hf \cdot \frac{F}{1 - \hf X^{-1}} = \frac{F}{2 - X^{-1}} \]
+
+\subsection{Termination Probability}
+\begin{figure}[t]
+	\centering
+	\begin{minipage}[t]{0.5\textwidth}
+		\begin{lstlisting}[label=prg:term_prob, caption=\ ]
+X := 0;
+F := 0;
+while ( F = 0 ) {
+  {
+    { X := X + 1 }[0.5]{ abort }
+  }[0.5]{
+    F := 1
+  }
+}
+		\end{lstlisting}
+	\end{minipage}
+	\caption{Example program with termination probability $< 1$.
+	\label{fig:termin_prob_lt_1}}
+\end{figure}
+Now, we will discuss the second example, the program in Figure~\ref{fig:termin_prob_lt_1}.
+The main difference to the other example programs is that it does not terminate with probability 1.
+We will derive a semantics and show that the loop halts with probability $\frac{2}{3}$.
+The loop does not halt with probability 1 because it contains an $\abort$ statement, so there are program runs that do not terminate at all.
+This affects the behaviour of the whole loop.
+For the program's loop $\while{B}{P}$, we have the following setting:
+\begin{itemize}
+	\item $B = (F = 0)$
+	\item $P = \l\{ \{ X := X + 1 \}[\hf]\{ \abort \} \r\} [\hf] \{ F := 1 \}$
+	\item $G = 1$
+	\item $\begin{aligned}[t]
+		 & \wh(D) = \smtx{P}(\resP{D}) \\
+		=& \hf \l( \hf \smtx{X := X + 1}(D) + \hf \smtx{\abort}(D) \r)
+			+ \hf \smtx{F := 1}(D) \\
+		=& \hf \l( \hf \smtx{X := X + 1}(D) + 0 \r) + \hf \smtx{F := 1}(D) \\
+		=& \frac{1}{4} \smtx{X := X + 1}(D) + \hf \smtx{F := 1}(D)
+		\end{aligned}$
+\end{itemize}
+The way to finding the loop semantics leads over finding a closed form for $\resN{\wh^i(G)}$.
+Doing this gives:
+\begin{align*}
+	& \resN{\wh^0 \l(G\r)} = \resN{1} = 0 \\
+	& \resN{\wh^i \l(G\r)}
+		= \hf \cdot \l(\frac{1}{4}\r)^{i-1} X^{i-1} F^1 \where i > 0
+\end{align*}
+A proof can be found in Appendix~\ref{proof:term_prob_lt_1}.
+The term is quite similar to the very first example, where we had
+\[ \resN{\wh^i(G)} = \half^i X^{i-1} F^1  \]
+The difference is that the exponentiated constant is not $\hf$ but $\frac{1}{4}$ and there is a constant factor of $\hf$ in front.
+The loop semantics is again a geometric series although there are the nested probabilistic choices and an $\abort$ statement.
+\begin{align*}
+	 & \smtx{\while{B}{P}}(G) \\
+	=& \resN{\wh^0(G)} + \sum_{i = 1}^{\infty} \resN{\wh^i \l(1G\r)} \\
+	=& 0 + \sum_{i = 1}^{\infty} \hf \cdot \l(\frac{1}{4}\r)^{i-1} X^{i-1} F^1 \\
+	 & \explain{factor out, transform indices} \\
+	=& \hf \cdot \sum_{i = 0}^{\infty} \l(\frac{1}{4}\r)^i X^i F^1 \\
+	 & \explain{closed form of geometric series} \\
+	=& \hf \cdot \frac{F}{1 - \frac{1}{4} X} \\
+	=& \frac{F}{2 - \hf X} \\
+\end{align*}
+Applying the absolute value to the loop semantics gives us the termination probability.
+\[ |\smtx{\while{B}{P}}(G)| = \l|\frac{F}{2 - \hf X}\r|
+	= \frac{1}{2 - \hf} = \frac{2}{3} \]
+We see that the loop does not terminate with probability $1$.
+
+\subsection{Two Equivalent Programs}
+
+\begin{figure}[t]
+	\begin{minipage}[t]{0.5\textwidth}
+		\begin{lstlisting}[caption=Consecutive loops.]
+X := 0;
+F := 0;
+while ( F = 0 ) {
+  { X := X + 1 }[p]{ F := 1 }
+};
+
+F := 0;
+while ( F = 0 ) {
+  { X := X - 1 }[q]{ F := 1 }
+}
+		\end{lstlisting}
+	\end{minipage}
+	\begin{minipage}[t]{0.5\textwidth}
+		\begin{lstlisting}[caption=Separated loops.]
+X := 0;
+{ F := 0 }[0.5]{ F := 1 };
+if ( F = 0 ) {
+  while ( F = 0 ) {
+    { X := X + 1 }[p]{ F := 1 }
+  }
+
+} else {
+  F := 0;
+  while ( F = 0 ) {
+    X := X - 1;
+    { skip }[q]{ F := 1 }
+  }
+}
+		\end{lstlisting}
+	\end{minipage}
+	\caption{Example programs from Kiefer et al.~\cite{kiefer:equivalent_programs}.
+	\label{fig:equivalent_progs}}
+\end{figure}
+
+The two programs in Figure~\ref{fig:equivalent_progs} are parametrised with $p$ and $q$.
+Both variables only occur in the probabilistic choices of the programs, so they are restricted to values in $[0, 1]$.
+In order to execute a program, a value for both variables must be chosen.
+However, our semantics can be applied leaving $p$ and $q$ in place which gives a more general result about the program's behaviour.
+The programs were introduced by Kiefer et al.~\cite{kiefer:equivalent_programs}.
+At the time, they were proven to be equivalent for $p = \frac{1}{2}$ and $q = \frac{2}{3}$.
+Later, Gretz et al.~\cite{gretz:prinsys} proved that the expected value of the variable $X$ is equivalent for all combinations of $p$ and $q$ satisfying $q = \frac{1}{2-p}$.
+We will extend this result and show that not only the expected value of $X$ is the same, but even the underlying distributions are equivalent for these combinations of $p$ and $q$.
+
+\subsubsection*{Consecutive Loops}
+The first program is basically the concatenation of the two canonical examples.
+It contains two loops, we will call them $L^+$ and $L^-$ because they respectively increment or decrement the variable $X$.
+$L^+$ generates the following geometric distribution over the positive integers:
+\[ \smtx{L^+}\l(1\r) = (1-p) \cdot \sum_{i = 0}^{\infty} p^i X^i F^1 \]
+A proof can be found in Appendix~\ref{proof:canonical_example}.
+The factor $1-p$ comes from taking the right branch of the probabilistic choice which sets $F$ to 1.
+This only happens once while the left branch can be taken arbitrarily often.
+That is why $p^i$ appears as a factor in the sum.
+If $X$ has the value $i$, the left branch was taken $i$ times, leading to the exponentiation of $p$.
+The next statement resets $F$ to 0, so now it remains to calculate
+\[ \smtx{L^-}\l( \smtx{F := 0; L^+}(1) \r)
+	= \smtx{L^-}\l((1-p) \cdot \sum_{i = 0}^{\infty} p^i X^i F^0 \r) \]
+To simplify the calculation and the upcoming comparison of the two results, we will now switch to writing the semantics using tuples.
+We have two variables, so the tuples have four entries.
+We can reduce this by having a look at the variables.
+Contrary to $X$, $F$ is only ever assigned 0 or 1, so $F$ is never negative.
+$X$ can have positive and negative valuations, because it is incremented and decremented.
+The entries of the semantics tuples where $F$ is negative are thus always 0, so we can as well leave them out.
+This reduces the tuples to two entries.
+We assign the non-negative valuations of $X$ to the first entry and the negative ones to the second entry.
+Unspectacularly, the semantics from above becomes
+\[ \smtx{L^-} \pair{ (1-p) \cdot \sum_{i = 0}^{\infty} p^i X^i F^0 , 0} \]
+The loop $L^-$ decrements $X$ in every iteration except its last, so after every iteration a new summand will be added to the second entry of the tuple.
+If the loop terminates after one iteration, no decrement took place and $F$ was immediately set to 1.
+If the loop terminates after two iterations, $X$ was decremented once to $-1$ and afterwards $F$ was set to 1.
+After $n$ iterations, the minimal value of $X$ is $-(n-1)$.
+This behaviour is expressed in $\wh^n$.
+Its general form is
+\begin{align*}
+	 & \resN{ \wh^n\pair{ (1-p) \cdot \sum_{i = 0}^{\infty} p^i X^i F^0 , 0} } \\
+	=& (1-q) \cdot q^{n-1} \cdot (1-p) \cdot \pair{
+		\sum_{i=0}^{\infty} p^{i+(n-1)} X^i F^1,
+		\sum_{i=1}^{n-1} p^{(n-1)-i} X^{-i} F^1}
+\end{align*}
+The factor $1-p$ is still there from the loop $L^+$.
+As above, $1-q$ stems from taking the right branch of the probabilistic choice once and $q^{n-1}$ from taking the left branch the other times.
+The minimal negative valuation of $X$ is $-(n-1)$.
+In the first tuple, the factors do not start with $p^0$ for $i$ equal to zero, but with $p^{i+n-1}$.
+This happens because lower values of $X$ are more likely to be decremented into the negative range than higher ones.
+Building the infinite series of all these terms gives the semantics of the whole program:
+\begin{align*}
+	 & \smtx{L^+; F := 0; L^-}\pair{1, 0} \\
+	 & \explain{semantics of concatenation} \\
+	=& \smtx{L^-}\l( \smtx{F := 0; L^-}(1, 0) \r) \\
+	 & \explain{semantics of the first loop $L^+$} \\
+	=& \smtx{L^-}\pair{ (1-p) \cdot \sum_{i = 0}^{\infty} p^i X^i F^0 , 0} \\
+	 & \explain{semantics of a loop} \\
+	=& \sum_{n=0}^{\infty} \resN{ \wh^n
+		\pair{ (1-p) \cdot \sum_{i = 0}^{\infty} p^i X^i F^0 , 0} } \\
+	 & \explain{simplify series, proof in Appendix \ref{proof:equivalent_programs}} \\
+	=& \frac{(1-q) \cdot (1-p)}{1-qp} \cdot
+		\pair{ \sum_{i=0}^{\infty} p^i X^i F^1,
+			q \cdot \sum_{i=0}^{\infty} q^i X^{-(i+1)} F^1} \\
+%	 & \explain{closed form of geometric series} \\
+%	=& \frac{(1-q) \cdot (1-p)}{1-qp} \cdot
+%		\pair{ \frac{F^1}{1 - p X}, \frac{q X^{-1} F^1}{1 - q X^{-1}}} \\
+%	 & \explain{distribute factors} \\
+%	 =& \pair{ \frac{(1-q) \cdot (1-p) \cdot F^1}{(1-qp) \cdot (1 - p X)},
+%	 	\frac{(1-q) \cdot (1-p) \cdot (q X F^1)}{(1-qp) \cdot (1 - q X)}}
+\end{align*}
+
+\subsubsection*{Separated Loops}
+Finding the second program's semantics is easier, because the two loops are in different branches of a conditional choice, so the second one does not operate on the result of the first one, but on a simpler PGF.
+As above, there is one loop that increments and one that decrements $X$.
+We will also name them $L^+$ and $L^-$, respectively.
+$L^-$ is slightly different than in the first program.
+Here, $X$ is decremented in every iteration of the loop and only afterwards the decision to either loop again or terminate the loop is made.
+Before treating the loops, we have to take care of the conditional choice and the probabilistic choice preceding it.
+In it, $F$ is set to 0 or 1 with probability $\hf$ each.
+Then $L^+$ is executed if $F$ is 0 and $L^-$ is executed otherwise.
+In fact, this is equivalent to the probabilistic choice
+\[ \l\{ L^+ \r\} \l[ 0.5 \r] \l\{ L^- \r\} \]
+For the semantics of the whole program, we will have to calculate
+\begin{align*}
+%	 & \smtx{L^+}\pair{\hf X^0 F^0, 0} + \smtx{L^-}\pair{\hf X^0 F^0, 0} \\
+%	 & \explain{semantics are linear} \\
+	\hf \cdot \smtx{L^+}\pair{1, 0}
+		+ \hf \cdot \smtx{L^-}\pair{1, 0}
+\end{align*}
+The first loop $L^+$ is the same as in the first canonical program, so we already know its semantics.
+\[ \hf \cdot \smtx{L^+}\pair{1, 0}
+	= \hf \cdot \pair{(1-p) \cdot \sum_{i=0}^{\infty} p^i X^i F^1, 0} \]
+For the loop $L^-$, we find that after $n$ iterations, the minimal value of $X$ is $-n$.
+We can see this in $\resN{\wh^i\pair{1, 0}}$ (proof in Appendix \ref{proof:equivalent_programs}):
+\[ \resN{\wh^i\pair{1, 0}} = (1-q) \cdot \pair{0, q^{i-1} X^{-i} F^1} \]
+The sum of all these terms gives us the loop semantics.
+\begin{align*}
+	 & \hf \cdot \smtx{L^-}\pair{1, 0} \\
+	=& \hf \cdot \sum_{i=0}^{\infty} \resN{ \wh^i \pair{1, 0} } \\
+	=& \hf \cdot \sum_{i=1}^{\infty} (1-q) \cdot \pair{0, q^{i-1} X^{-i} F^1} \\
+	 & \explain{factor out, transform indices} \\
+	=& \hf \cdot \pair{0, (1-q) \cdot \sum_{i=0}^{\infty} q^i X^{-(i+1)} F^1}
+\end{align*}
+We now know the semantics of both loops, so we add them to get the semantics of the whole program.
+\begin{align*}
+	 & \hf \cdot \smtx{L^+}\pair{1, 0}
+		 + \hf \cdot \smtx{L^-}\pair{1, 0} \\
+	 & \explain{substitute results} \\
+	=& \hf \cdot \pair{(1-p) \cdot \sum_{i=0}^{\infty} p^i X^i F^1, 0}
+		+ \hf \cdot \pair{0, (1-q) \cdot \sum_{i=0}^{\infty} q^i X^{-(i+1)} F^1} \\
+	=& \hf \cdot \pair{(1-p) \cdot \sum_{i=0}^{\infty} p^i X^i F^1,
+			(1-q) \cdot \sum_{i=0}^{\infty} q^i X^{-(i+1)} F^1} \\
+	 & \explain{distribute $\hf$} \\
+	=& \pair{\frac{1-p}{2} \cdot \sum_{i=0}^{\infty} p^i X^i F^1,
+		\frac{1-q}{2} \cdot \sum_{i=0}^{\infty} q^i X^{-(i+1)} F^1}
+\end{align*}
+
+\subsubsection*{Equivalence}
+After determining the semantics for both programs, we will now find out the values of $p$ and $q$ for which they are equivalent.
+Remember semantics (1) and (2) for their programs:
+\begin{align*}
+	& \frac{(1-q) \cdot (1-p)}{1-qp} \cdot
+		\pair{ \sum_{i=0}^{\infty} p^i X^i F^1,
+			q \cdot \sum_{i=0}^{\infty} q^i X^{-(i+1)} F^1} \tag{1} \\
+	& \pair{\frac{1-p}{2} \cdot \sum_{i=0}^{\infty} p^i X^i F^1,
+		\frac{1-q}{2} \cdot \sum_{i=0}^{\infty} q^i X^{-(i+1)} F^1} \tag{2}
+\end{align*}
+One can see that sums in the corresponding entries of both tuples are the same.
+They only differ in the constants they are multiplied by.
+In consequence, we can simply equate them and solve for $q$.
+Because the tuples have two entries, we get two equations.
+\begin{align}
+	& \frac{(1-q) \cdot (1-p)}{1-qp} = \frac{1-p}{2} \tag{1} \\
+	& \frac{(1-q) \cdot (1-p) \cdot q}{1-qp} = \frac{1-q}{2} \tag{2}
+\end{align}
+Solving these for $q$ gives the same result in both cases.
+Hence, extending the results of Gretz et al. in~\cite{gretz:prinsys}, we proved that the two programs are equal in distribution for
+\[ q = \frac{1}{2 - p} \where p, q \neq 1\ . \]

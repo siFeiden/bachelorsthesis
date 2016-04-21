@@ -1,0 +1,195 @@
+\subsubsection*{Consecutive Loops}
+Two statements about the loop $L^-$ in the first program of Figure~\ref{fig:equivalent_progs} remain to be proved.
+First, we have to show the general form of $\wh^i$ and then the simplification of the infinite sum of all these terms.
+$L^-$ operates on the PGF generated from $L^+$, the first loop in the program.
+After $L^+$ and before $L^-$, the variable $F$ is set to 0, which only changes $F$'s exponent in the previous PGF.
+The input for $L^-$ then is the following geometric distribution $G$, as proven in~\ref{proof:canonical_example}.
+\[ G = \smtx{F := 0; L^+}\pair{1, 0}
+	= (1-p) \cdot \pair{\sum_{i = 0}^{\infty} p^i X^i F^0, 0} \]
+\begin{lemma}
+	For the loop $L^-$, the following holds:
+	\begin{align*}
+		 & \resN{ \wh^n\l( G \r) } \\
+		=& (1-q) \cdot q^{n-1} \cdot (1-p) \cdot \pair{
+			\sum_{i=0}^{\infty} p^{i+(n-1)} X^i F^1,
+			\sum_{i=1}^{n-1} p^{(n-1)-i} X^{-i} F^1}
+	\end{align*}
+	\begin{proof}
+		We will prove the equation above without the restriction to $\lnot B$ and apply it afterwards. \\
+		Proof by induction over $n$. \\
+		\textbf{Base Case} for $n = 1$: \\
+		\begin{align*}
+			 & \wh^1(G) \\
+			=& q \cdot \smtx{X := X - 1}(G) + (1-q) \cdot \smtx{F := 1}(G) \\
+			=& q \cdot (1-p) \cdot \pair{\sum_{i = 0}^{\infty} p^{i+1} X^i F^0,
+				1 X^{-1} F^0} \\
+			 & + (1-q) \cdot (1-p) \cdot \pair{\sum_{i = 0}^{\infty} p^i X^i F^1, 0} \\
+			 & \explain{empty sum in second entry is zero} \\
+			=& q \cdot (1-p) \cdot \pair{\sum_{i = 0}^{\infty} p^{i+1} X^i F^0,
+				1 X^{-1} F^0} \\
+			 & + (1-q) \cdot (1-p) \cdot \pair{\sum_{i = 0}^{\infty} p^i X^i F^1,
+			 	\sum_{i=1}^{1-1} p^{(1-1)-i} X^{-i} F^q}
+		\end{align*}
+		\textbf{Induction Hypothesis}:
+		\begin{align*}
+			 & \text{For some } n > 0 \colon \\
+			 & \wh^n(G) \\
+			=& q^n \cdot (1-p) \cdot \pair{
+			 	\sum_{i=0}^{\infty} p^{i+n} X^i F^0,
+			 	\sum_{i=1}^{n} p^{n-i} X^{-i} F^0} \\
+			 & + (1-q) \cdot q^{n-1} \cdot (1-p) \cdot \pair{
+			 	\sum_{i=0}^{\infty} p^{i+(n-1)} X^i F^1,
+			 	\sum_{i=1}^{n-1} p^{(n-1)-i} X^{-i} F^1}
+		\end{align*}
+		\textbf{Inductive Step}:
+		One can easily verify that restricting $\wh^n(G)$ from the induction hypothesis to $B$ gives the first summand of $\wh^n(G)$, because in the second summand, $F$ always has value 1.
+		\[ \resP{\wh^n(G)} = q^n \cdot (1-p) \cdot \pair{
+			\sum_{i=0}^{\infty} p^{i+n} X^i F^0, \sum_{i=1}^{n} p^{n-i} X^{-i} F^0} \]
+		We can use this for the inductive step.
+		\begin{align*}
+			 & \wh^{n+1}\pair{G} \\
+			=& \wh\l( \wh^n\pair{G} \r) \\
+			 & \explain{definition of $\wh$} \\
+			=& \smtx{P}\l( \resP{ \wh^n\pair{G} } \r) \\
+			 & \explain{induction hypothesis + equation above} \\
+			=& \smtx{P}\l( q^n \cdot (1-p) \cdot \pair{
+			 	\sum_{i=0}^{\infty} p^{i+n} X^i F^0,
+			 	\sum_{i=1}^{n} p^{n-i} X^{-i} F^0} \r) \\
+			 & \explain{apply $P$} \\
+			=& q \cdot q^n \cdot (1-p) \cdot \pair{
+				\sum_{i=0}^{\infty} p^{i+n+1} X^i F^0,
+				p^n X^{-1} F^0 + \sum_{i=1}^{n} p^{n-i} X^{-i-1} F^0 } \\
+			 & + (1-q) \cdot q^n \cdot (1-p) \cdot \pair{
+			 	\sum_{i=0}^{\infty} p^{i+n} X^i F^1,
+			 	 \sum_{i=1}^{n} p^{n-i} X^{-i} F^1 } \\
+			 & \explain{transform sum indices in second entry} \\
+			=& q^{n+1} \cdot (1-p) \cdot \pair{
+				\sum_{i=0}^{\infty} p^{i+(n+1)} X^i F^0,
+				p^n X^{-1} F^0 + \sum_{i=2}^{n+1} p^{(n+1)-i} X^{-i} F^0 } \\
+			 & + (1-q) \cdot q^n \cdot (1-p) \cdot \pair{
+				\sum_{i=0}^{\infty} p^{i+n} X^i F^1,
+				\sum_{i=1}^{n} p^{n-i} X^{-i} F^1 } \\
+			 & \explain{merge sum in second entry} \\
+			=& q^{n+1} \cdot (1-p) \cdot \pair{
+				\sum_{i=0}^{\infty} p^{i+(n+1)} X^i F^0,
+				\sum_{i=1}^{n+1} p^{(n+1)-i} X^{-i} F^0 } \\
+			& + (1-q) \cdot q^{(n+1)-1} \cdot (1-p) \cdot \pair{
+				\sum_{i=0}^{\infty} p^{i+((n+1)-1)} X^i F^1,
+				\sum_{i=1}^{n} p^{((n+1)-1)-i} X^{-i} F^1 } \\
+		\end{align*}
+		The induction hypothesis is proven by induction.
+		The final result is now obtained by restriction to $\lnot B$.
+		One can easily see that restricting $\wh^n(G)$ to $\lnot B$ leaves only the second summand, because $F$ has value 1 only in this part of the PGF.
+		\begin{align*}
+			 & \resN{\wh^n(G)} \\
+			=& (1-q) \cdot q^{n-1} \cdot (1-p) \cdot \pair{
+				\sum_{i=0}^{\infty} p^{i+(n-1)} X^i F^1,
+				\sum_{i=1}^{n-1} p^{(n-1)-i} X^{-i} F^1}			\qedhere
+		\end{align*}
+	\end{proof}
+\end{lemma}
+
+Next we want to prove the whole semantics of $L^-$.
+\begin{lemma}
+	The following holds.
+	\begin{align*}
+		 & \smtx{L^-}\pair{(1-p) \cdot \pair{\sum_{i = 0}^{\infty} p^i X^i F^0, 0}} \\
+		=& \frac{(1-q) \cdot (1-p)}{1-qp} \cdot \pair{
+			\sum_{n=0}^{\infty} p^n X^n F^1,
+			q \cdot \sum_{n=0}^{\infty} q^n X^{-(n+1)} F^1 }
+	\end{align*}
+	\begin{proof}
+	\begin{align*}
+		 & \smtx{L^-}\pair{(1-p) \cdot \pair{\sum_{i=0}^{\infty} p^i X^i F^0, 0}} \\
+		 & \explain{loop semantics} \\
+		=& \sum_{n=0}^{\infty} \resN{
+			\wh^n\pair{(1-p) \cdot \pair{\sum_{i=0}^{\infty} p^i X^i F^0, 0}} } \\
+		 & \explain{insert result of previous proof} \\
+		=& \sum_{n=1}^{\infty} (1-q) \cdot q^{n-1} \cdot (1-p) \cdot \pair{
+			\sum_{i=0}^{\infty} p^{i+(n-1)} X^i F^1,
+			\sum_{i=1}^{n-1} p^{(n-1)-i} X^{-i} F^1} \\
+		 & \explain{factor out} \\
+		=& (1-q) \cdot (1-p) \cdot \sum_{n=1}^{\infty} q^{n-1} \cdot \pair{
+			\sum_{i=0}^{\infty} p^{i+(n-1)} X^i F^1,
+			\sum_{i=1}^{n-1} p^{(n-1)-i} X^{-i} F^1} \\
+		 & \explain{expand sums} \\
+		=& (1-q) \cdot (1-p) \cdot \Big( \\
+		& \phantom{\ +} q^0 \cdot \pair{ p^0 X^0 F^1 + p^1 X^1 F^1 + \ldots,
+			0 } && |\ n = 1 \\
+		& + q^1 \cdot \pair{ p^1 X^0 F^1 + p^2 X^1 F^1 + \ldots,
+			p^0 X^{-1} F^1 } && |\ n = 2 \\
+		& + q^2 \cdot \pair{ p^2 X^0 F^1 + p^3 X^1 F^1 + \ldots,
+			p^1 X^{-1} F^1 + p^0 X^{-2} F^1 } && |\ n = 3 \\
+		& + q^3 \cdot \pair{ p^3 X^0 F^1 + p^4 X^1 F^1 + \ldots,
+			 p^2 X^{-1} F^1 + p^1 X^{-2} F^1 + p^0 X^{-3} F^1  } && |\ n = 4 \\
+		& + \ldots \Big)
+	\end{align*}
+	%In order to simplify the last expression, we will consider its entries separately.
+	If we look at the entries in the last expression columnwise, the factors of $X^n F^1$ for $n \in \Z$ are right under each other.
+	Together with the factor $q^n$ in front, they form the geometric series $\sum_{i=0}^{\infty} q^i p^i$ multiplied by a constant factor depending on $n$.
+	Hence, the sum of all $X^n F^1$ simplifies to a single expression as follows:
+	\begin{align*}
+		& p^n \cdot \l(\sum_{i=0}^{\infty} q^i p^i\r) \cdot X^n F^1 \where n \geq 0 \\
+		& q^n \cdot \l(\sum_{i=0}^{\infty} q^i p^i\r) \cdot X^{-n} F^1 \where n < 0
+	\end{align*}
+	Continuing the equations from above, this gives:
+	\begin{align*}
+		=& (1-q) \cdot (1-p) \cdot \pair{
+			\sum_{n=0}^{\infty} p^n \cdot \l(\sum_{i=0}^{\infty} q^i p^i\r) \cdot X^n F^1,
+			\sum_{n=1}^{\infty} q^n \cdot \l(\sum_{i=0}^{\infty} q^i p^i\r)
+				\cdot X^{-n} F^1 } \\
+		 & \explain{geometric series} \\
+		=& (1-q) \cdot (1-p) \cdot \pair{
+			\sum_{n=0}^{\infty} p^n \cdot \frac{1}{1-qp} \cdot X^n F^1,
+			\sum_{n=1}^{\infty} q^n \cdot \frac{1}{1-qp} \cdot X^{-n} F^1 } \\
+		 & \explain{factor out} \\
+		=& \frac{(1-q) \cdot (1-p)}{1-qp} \cdot \pair{
+			\sum_{n=0}^{\infty} p^n X^n F^1,
+			\sum_{n=1}^{\infty} q^n X^{-n} F^1 } \\
+		 & \explain{transform indices in second entry} \\
+		=& \frac{(1-q) \cdot (1-p)}{1-qp} \cdot \pair{
+			\sum_{n=0}^{\infty} p^n X^n F^1,
+			q \cdot \sum_{n=0}^{\infty} q^n X^{-(n+1)} F^1 }
+	\end{align*}
+	\end{proof}
+\end{lemma}
+
+
+\subsubsection*{Separated Loops}
+For the loop $L^-$ in the second program in Figure~\ref{fig:equivalent_progs}, we have to prove a statement about $\resN{\wh^i\pair{1, 0}}$
+\begin{lemma}
+	For the loop $L^-$, the following holds:
+	\[ \resN{\wh^i\pair{1, 0}} = (1-q) \cdot \pair{0, q^{i-1} X^{-i} F^1} \]
+	\begin{proof}
+		We will prove the equation above without the restriction to $\lnot B$ and apply it afterwards. \\
+		Proof by induction over $i$. \\
+		\textbf{Base Case} for $i = 1$: \\
+		\[ \wh^i\pair{1, 0} = \pair{0, q X^{-1} F^0} + \pair{0, (1-q) X^{-1} F^1} \]
+		\textbf{Induction Hypothesis}:
+		\[ \wh^i\pair{1, 0} = \pair{0, q^i X^{-i} F^0}
+			+ \pair{0, (1-q) \cdot q^{i-1} X^{-i} F^1} \text{ for some } i > 0 \]
+		\textbf{Inductive Step}:
+		\begin{align*}
+			 & \wh^{i+1}\pair{1, 0} \\
+			=& \wh\l( \wh^i\pair{1, 0} \r) \\
+			 & \explain{definition of $\wh$} \\
+			=& \smtx{P}\l( \resP{ \wh^i\pair{1, 0} } \r) \\
+			 & \explain{induction hypothesis} \\
+			=& \smtx{P}\l( \resP{ \pair{0, q^i X^{-i} F^0}
+				+ \pair{0, (1-q) \cdot q^{i-1} X^{-i} F^1} } \r) \\
+			 & \explain{$B = (F = 0)$} \\
+			=& \smtx{P}\l( \pair{0, q^i X^{-i} F^0} \r) \\
+			 & \explain{$P = \l( X := X - 1; \{ \nop \}[q]\{ F := 1 \} \r)$} \\
+			=& \pair{0, q^{i+1} X^{-(i-1)} F^0}
+				+ \pair{0, (1-q) \cdot q^i X^{-(i+1)} F^1}
+		\end{align*}
+		The intermediate claim is proven by induction.
+		The final result is now obtained by restriction to $\lnot B$.
+		\begin{align*}
+			 & \resN{\wh^i(1)} \\
+			=& \resN{ \pair{0, q^i X^{-i} F^0}
+				+ \pair{0, (1-q) \cdot q^{i-1} X^{-i} F^1} } \\
+			=& \pair{0, (1-q) \cdot q^{i-1} X^{-i} F^1}			\qedhere
+		\end{align*}
+	\end{proof}
+\end{lemma}

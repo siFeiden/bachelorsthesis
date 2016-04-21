@@ -1,0 +1,52 @@
+In this proof, we will not show the exact statement for the canonical example, but a more general one.
+Therefore, we slightly modify the loop body $P$ by parametrising it with a variable $p\in [0, 1]$.
+\[ P_p = \{ X := X + 1 \}[p]\{ F := 1 \} \]
+The statement needed for the canonical example then is the special case $p = \hf$.
+\begin{lemma}
+	Let $B = (F = 0)$ be a Boolean condition and $P_p$ as above with $p \in [0, 1]$.
+	Then
+	\[ \resN{\operatorname{wh}_{B, P_p}^i\l(1\r)}
+		= (1-p) \cdot p^{i-1} X^{i-1} F^1 \where i > 0 \]
+	\begin{proof}
+		We will prove the equation above without the restriction to $\lnot B$ and apply it afterwards. \\
+		Proof by induction over $i$. \\
+		\textbf{Base Case} for $i = 1$: \\
+		\[ \operatorname{wh}_{B, P_p}^1\l(1\r)
+			= p^1 X^1 F^0 + (1-p)^1 X^0 F^1 \]
+		\textbf{Induction Hypothesis}:
+		\[ \operatorname{wh}_{B, P_p}^i\l(1\r)
+			= p^i X^i F^0 + (1-p) \cdot p^{i-1} X^{i-1} F^1 \text{ for some } i > 0 \]
+		\textbf{Inductive Step}:
+		\begin{align*}
+			 & \operatorname{wh}_{B, P_p}^{i + 1}\l(1\r) \\
+			=& \operatorname{wh}_{B, P_p}\l(
+				\operatorname{wh}_{B, P_p}^i\l(1 \r) \r) \\
+			 & \explain{definition of $\operatorname{wh}_{B, P_p}$} \\
+			=& \smtx{P}\l( \resP{ \operatorname{wh}_{B, P_p}^i\l(1\r) } \r) \\
+			 & \explain{induction hypothesis} \\
+			=& \smtx{P}\l( \resP{p^i X^i F^0 + (1-p) \cdot p^{i-1} X^{i-1} F^1} \r) \\
+			 & \explain{$B = (F = 0)$} \\
+			=& \smtx{P}\l( p^i X^i F^0 \r) \\
+			 & \explain{semantics of $P$} \\
+			=& p \cdot p^i X^{i+1} F^0 + (1-p) \cdot p^i X^i F^1 \\
+			=& p^{i+1} X^{i+1} F^0 + (1-p) \cdot p^i X^i F^1
+		\end{align*}
+		The intermediate claim is proven by induction.
+		The final result is now obtained by restriction to $\lnot B$:
+		\[ \resN{\operatorname{wh}_{B, P_p}^i\l(1\r)}
+			= \resN{p^i X^i F^0 + (1-p) \cdot p^{i-1} X^{i-1} F^1}
+			= (1-p) \cdot p^{i-1} X^{i-1} F^1		\qedhere \]
+	\end{proof}
+\end{lemma}
+Summing all $\wh^i(1)$ gives us the semantics of the more general loop:
+\begin{align*}
+	 & \smtx{\while{B}{P_p}}(1) \\
+	=& \resN{\operatorname{wh}_{B, P_p}^0(1)}
+		+ \sum_{i = 1}^{\infty}
+			\resN{\operatorname{wh}_{B, P_p}^i \l(1\r)} \\
+	=& 0 + \sum_{i = 1}^{\infty} (1-p) \cdot p^{i-1} X^{i-1} F^1 \\
+	 & \explain{factor out, transform indices} \\
+	=& (1-p) \cdot \sum_{i = 0}^{\infty} p^i X^i F^1 \\
+	 & \explain{closed form of geometric series} \\
+	=& \frac{(1-p) F}{1 - p X}
+\end{align*}

@@ -1,0 +1,210 @@
+\documentclass[12pt]{article}
+
+\usepackage[a4paper,scale=0.8]{geometry}
+\usepackage[english]{babel} % needed for English texts
+\usepackage[utf8]{inputenc} % unicode encoding
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{stmaryrd}
+\usepackage{listings}
+\usepackage{bussproofs}
+\usepackage{hyperref}  % automagically makes clickable references, table of contents
+\usepackage{thmtools}
+%\usepackage{enumerate} % enumerate replaced by enumitem
+\usepackage[shortlabels]{enumitem}
+%\usepackage[a4,frame,center,noinfo]{crop}	% frame around pages
+\usepackage{setspace}
+\usepackage{pdfpages}
+
+
+\newtheorem{definition}{Definition}[section] % defines the definition environment
+\newtheorem{theorem}{Theorem}[section] % defines the theorem environment
+\newtheorem{lemma}{Lemma}[section]
+%\newtheorem{proof}{Proof}[section] % defines the proof environment
+
+% Sets and set operation
+\newcommand{\R}{\mathbb{R}} % the reals
+\newcommand{\Z}{\mathbb{Z}} % the integers
+\newcommand{\N}{\mathbb{N}} % the natural numbers
+\renewcommand{\S}{\mathbb{S}} % state space
+\newcommand{\leqD}{\sqsubseteq_{D}} % cpo
+\newcommand{\leqL}{\sqsubseteq_{L}} % cpo
+%\newcommand{\pot}[1]{\mathcal{P}(#1)} % power set
+
+\newcommand{\E}{\mathbb{E}}
+
+% Programs
+\newcommand{\smtx}[1]{\left\llbracket #1 \right\rrbracket} % semantic brackets
+\newcommand{\res}[2]{\left\langle #1 \right\rangle_{#2}} % restriction
+\newcommand{\resP}[1]{\res{#1}{B}} % restriction to B
+\newcommand{\resN}[1]{\res{#1}{\lnot B}} % restriction to not B
+\newcommand{\nop}{\textit{skip}} % skip statement
+\newcommand{\abort}{\textit{abort}} % abort statement
+\newcommand{\ifp}[3]{\textit{if}\,(#1) \, \{ \, #2 \, \} \, \textit{else} \, \{ \, #3 \, \} } % if statement
+\newcommand{\while}[2]{\textit{while}\,(#1) \{#2\}} % while loop
+
+\newcommand{\wh}{\operatorname{wh}_{B, P}}
+\newcommand{\hh}{\operatorname{H}_{B, P}}
+\newcommand{\ww}{\operatorname{ww}_f}
+\renewcommand{\wp}[1]{\operatorname{wp}\l( #1 \r)}
+
+% Convenience
+\newcommand{\qu}{\frac{1}{4}} % 1 / 4
+\newcommand{\half}{\l( \frac{1}{2} \r)} % (1 / 2)
+\newcommand{\hf}{\frac{1}{2}} % 1 / 2
+\newcommand{\IH}[1]{\overset{IH}{#1}} % for induction hypothesis
+\newcommand{\pair}[1]{\left( #1 \right)} % round parentheses
+\renewcommand{\l}{\left} % short left
+\renewcommand{\r}{\right} % short right
+\newcommand{\infsum}{\sum\limits_{i = 0}^{\infty}} % sum from 0 to inf over variable i
+\newcommand{\multisum}[1]{\sum\limits_{s \in \N^k} #1 X_1^{s_1} \cdots X_k^{s_k}}
+\newcommand{\Xok}{X_1^{s_1} \cdots X_k^{s_k}} % variables X_1 to X_k
+\newcommand{\explain}[1]{\hspace*{2em} \l(\text{\small #1}\r)} % explanation in proof, indented line with smaller text
+\newcommand{\where}{, \text{ where }}
+
+% Display
+\renewcommand{\vert}{\ | \ }
+
+% Bussproofs spacing around horizontal line
+\renewcommand{\extraVskip}{5pt}
+
+\addtolength{\jot}{0.5em} % increase align line spacing
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}	% horizontal lines for title
+
+% math symbol for general cartesian product, copied from kpfonts.sty, lines 611 & 1495
+\DeclareSymbolFont{largesymbolsA}{U}{jkpexa}{m}{n}
+\DeclareMathSymbol{\bigX}{\mathop}{largesymbolsA}{16}
+\newcommand{\bigtimes}{\bigX} % redundant declaration to make texstudio recognize \bigtimes
+
+
+% (re)define square subsets
+\DeclareFontFamily{U}{mathb}{\hyphenchar\font45}
+\DeclareFontShape{U}{mathb}{m}{n}{
+	<5> <6> <7> <8> <9> <10> gen * mathb
+	<10.95> mathb10 <12> <14.4> <17.28> <20.74> <24.88> mathb12
+}{} 
+\DeclareSymbolFont{mathb}{U}{mathb}{m}{n}
+\DeclareMathSymbol{\sqsubseteq} {3}{mathb}{"84}
+\DeclareMathSymbol{\sqsupseteq} {3}{mathb}{"85}
+\DeclareMathSymbol{\sqsubsetneq}{3}{mathb}{"88}
+\DeclareMathSymbol{\sqsupsetneq}{3}{mathb}{"89}
+
+
+\lstset{language=Java} % lstlisting language
+\setlist[description]{font=\normalfont\space} % normal font in description env. labels
+
+
+
+%\title{Extending Probability Generating Function Semantics to Negative Variable Valuations}
+%\date{Winter Semester 2015/16}
+%\author{Simon Feiden\\Supervisor: Benjamin Kaminski}
+
+
+\begin{document}
+	
+\begin{titlepage}
+	\center
+	
+	\vspace*{1cm}
+	
+	\textsc{\LARGE Rwth Aachen University}\\[2cm]
+	
+	
+	\HRule \\[0.4cm]
+	\begin{onehalfspace}
+		\LARGE \bfseries Extending Probability Generating Function Semantics to Negative Variable Valuations
+	\end{onehalfspace}
+	\HRule \\[1.5cm]
+
+
+	{\large Bachelor's Thesis} \\[0.4cm]
+	{\large of Simon Feiden } \\[0.4cm]
+	{\small March 29, 2016} \\[5cm]
+%	{\today}\\[3cm]
+	
+	
+	\begin{minipage}{0.7\textwidth}
+		\begin{flushleft} \large
+			\emph{Advisor} \\
+			Benjamin Kaminski \\[0.2cm]
+			\emph{First Reviewer} \\
+			Prof. Dr. Ir. Joost-Pieter Katoen \\[0.2cm]
+			\emph{Second Reviewer} \\
+			apl. Prof. Dr. Thomas Noll
+		\end{flushleft}
+	\end{minipage}
+	~
+	\begin{minipage}{0.1\textwidth}
+		\begin{flushright}
+		\end{flushright}
+	\end{minipage}
+	
+	\vfill
+\end{titlepage}
+
+
+\null
+\thispagestyle{empty}
+\newpage
+
+
+\includepdf{oath.pdf}
+
+
+\null
+\thispagestyle{empty}
+\newpage
+
+
+\input{bounds/abstract.tex}
+\newpage
+
+
+\tableofcontents
+\newpage
+
+
+\section{Introduction}
+\input{bounds/introduction.tex}
+\newpage
+
+
+\section{Preliminaries}
+\input{semantics/preliminaries.tex}
+\newpage
+
+
+\section{Extended Semantics}
+\input{semantics/extended.tex}
+\newpage
+
+
+\section{Case Studies}
+\input{semantics/examples.tex}
+\newpage
+
+
+\section{Bisimulations}
+\input{semantics/bisimulations.tex}
+\newpage
+
+
+\section{Semantics Equivalence}
+\input{semantics/equivalence.tex}
+\newpage
+
+
+\section{Conclusion and Future Work}
+\input{bounds/conclusion.tex}
+\newpage
+
+
+\section{Appendix}
+\input{appendix/appendix.tex}
+\newpage
+
+
+\bibliographystyle{alpha}
+\bibliography{literature}
+
+\end{document}

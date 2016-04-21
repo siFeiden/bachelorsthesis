@@ -1,0 +1,20 @@
+\begin{theorem}[continues=theo:ext:whilesmtx]
+	Let $B$ be a Boolean condition and $P$ a program.
+	Then \[ \smtx{\while{B}{P}}(G) = \sum_{i = 0}^{\infty} \resN{\wh^i(G)} \]
+	
+	\begin{proof}
+		We know that
+		\[ \infsum \resN{\wh^i(G)} = \lim_{n \in \N} \sum_{i=0}^{n} \resN{\wh^i(G)} \]
+		Since the partial sums are monotonically increasing, we can replace $\lim$ with $\sup$.
+		\begin{align*}
+			 & \infsum \resN{\wh^i(G)} \\
+			=& \sup_{n \in \N} \l\{ \sum_{i=0}^{n} \resN{\wh^i(G)} \r\} \\
+			=& \sup_{n \in \N} \l\{ \hh^{n+1}(\bot)(G) \r\} \\
+			 & \explain{$\hh^0(\bot)(G) = 0$} \\
+			=& \sup_{n \in \N} \l\{ \hh^{n}(\bot)(G) \r\} \\
+			 & \explain{$\hh$ is Scott-continuous} \\
+			=& \sup_{n \in \N} \l\{ \hh^{n}(\bot) \r\}(G) \\
+			=& \smtx{\while{B}{P}}(G)			\qedhere
+			\end{align*}
+	\end{proof}
+\end{theorem}

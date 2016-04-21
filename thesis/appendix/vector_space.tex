@@ -1,0 +1,108 @@
+We want to prove that the PGFs with extended range combined with addition and scalar multiplication form a vector space.
+Recall the definition of vector space.
+\begin{definition}[Vector Space~\cite{brown:vector_space}]
+	A vector space $V$ over a field $F$ is a non-empty set $V$ together with two functions, 
+	$+ \colon V \times V \to V$ and $\cdot \colon F \times V \to V$,
+	which satisfy the following properties:
+	\begin{enumerate}
+		\item[] Let $u, v, w \in V$ and $r, s \in F$ be arbitrarily chosen.
+		\item $ v + w = w + v $
+		\item $ u + (v + w) = (u + v) + w $
+		\item There exists $0 \in V$ such that $ 0 + v = v  $.
+		\item There exists $(-v) \in V$ such that $ v + (-v) = 0 $.
+		\item $ (r \cdot s) \cdot v = r \cdot (s \cdot v) $
+		\item $ r \cdot (u + v) = r \cdot u + r \cdot v $
+		\item $ (r + s) \cdot v = r \cdot v + s \cdot v $
+		\item $ 1 \cdot v = v $, where $1$ is the multiplicative identity of the field $F$
+	\end{enumerate}
+\end{definition}
+For the PGFs with extended range, we have
+\begin{itemize}
+	\item $ V = \l\{ \sum_{s \in \Z^k} \mu_s \Xok \middle| \mu_s \in \R \r\} $
+	\item $ F = \R $
+\end{itemize}
+For $v = \sum_{s \in \Z^k} \mu_s \Xok$ and $w = \sum_{s \in \Z^k}\mu_s' \Xok$
+and $r \in \R$, the two operations are defined as follows:
+\begin{itemize}
+	\item $\begin{aligned}[t]
+			& + \colon V \times V \to V \\
+			& v + w = \sum_{s \in \Z^k} (\mu_s + \mu_s') \Xok
+	\end{aligned}$
+	\item $\begin{aligned}[t]
+			& \cdot \colon \R \times V \to V \\
+			& r \cdot v = \sum_{s \in \Z^k} (r \cdot \mu_s) \Xok
+		\end{aligned}$
+\end{itemize}
+To prove that $(V, \cdot, +)$ is a vector space, we have to prove properties $1$ to $8$.
+\begin{theorem}[continues=theo:ext:vectorspace]
+	The set of FPSs with extended range combined with addition and scalar multiplication forms a \emph{vector space}.
+\begin{proof}
+	Let $u, v, w \in V$ with their coefficients $\sigma_s, \mu_s$ and $\tau_s$, respectively, be arbitrarily chosen.
+	Additionally, let $r, s \in \R$ be arbitrarily chosen.
+	\begin{enumerate}
+		\item $\begin{aligned}[t]
+			 & v + w \\
+			=& \sum_{s \in \Z^k} (\mu_s + \tau_s) \Xok \\
+			=& \sum_{s \in \Z^k} (\tau_s + \mu_s) \Xok \\
+			=& w + v
+		\end{aligned}$
+		\item $\begin{aligned}[t]
+			 & u + (v + w) \\
+			=& \sum_{s \in \Z^k} (\sigma_s + (\mu_s + \tau_s)) \Xok \\
+			=& \sum_{s \in \Z^k} ((\sigma_s + \mu_s) + \tau_s) \Xok \\
+			=& (u + v) + w
+		\end{aligned}$
+		\item Let $0 = \sum_{s \in \Z^k} 0 \Xok \in V$.
+		Then, \vspace{1em} \\
+		$\begin{aligned}[t]
+			 & 0 + v \\
+			=& \sum_{s \in \Z^k} (0 + \mu_s) \Xok \\
+			=& \sum_{s \in \Z^k} \mu_s \Xok \\
+			=& v
+		\end{aligned}$
+		\item Let $-v = \sum_{s \in \Z^k} (-\mu_s) \Xok \in V$.
+		Then, \vspace{1em} \\
+		$\begin{aligned}[t]
+			 & v + (-v) \\
+			=& \sum_{s \in \Z^k} (\mu_s + (-\mu_s)) \Xok \\
+			=& \sum_{s \in \Z^k} 0 \Xok \\
+			=& 0
+		\end{aligned}$
+		\item $\begin{aligned}[t]
+			 & (r \cdot s) \cdot v \\
+			=& \sum_{s \in \Z^k} ((r \cdot s) \cdot \mu_s) \Xok \\
+			=& \sum_{s \in \Z^k} (r \cdot (s \cdot \mu_s)) \Xok \\
+			=& r \cdot \sum_{s \in \Z^k} (s \cdot \mu_s) \Xok \\
+			=& r \cdot (s \cdot v)
+		\end{aligned}$
+		\item $\begin{aligned}[t]
+			 & r \cdot (v + w) \\
+			=& r \cdot \l( \sum_{s \in \Z^k} (\mu_s + \tau_s) \Xok \r) \\
+			=& \sum_{s \in \Z^k} (r \cdot (\mu_s + \tau_s)) \Xok \\
+			=& \sum_{s \in \Z^k} (r \cdot \mu_s + r \cdot \tau_s) \Xok \\
+			=& \sum_{s \in \Z^k} (r \cdot \mu_s) \Xok
+				+ \sum_{s \in \Z^k} (r \cdot \tau_s) \Xok \\
+			=& r \cdot \sum_{s \in \Z^k} \mu_s \Xok
+				+ r \cdot \sum_{s \in \Z^k} \tau_s \Xok \\
+			=& r \cdot v + r \cdot w
+		\end{aligned}$
+		\item $\begin{aligned}[t]
+			 & (r + s) \cdot v \\
+			=& \sum_{s \in \Z^k} ((r + s) \cdot \mu_s) \Xok \\
+			=& \sum_{s \in \Z^k} (r \cdot \mu_s + s \cdot \mu_s) \Xok \\
+			=& \sum_{s \in \Z^k} (r \cdot \mu_s) \Xok
+				+ \sum_{s \in \Z^k} (s \cdot \mu_s) \Xok \\
+			=& r \cdot \sum_{s \in \Z^k} \mu_s \Xok
+			+ s \cdot \sum_{s \in \Z^k} \mu_s \Xok \\
+			=& r \cdot v + s \cdot v
+		\end{aligned}$
+		\item $\begin{aligned}[t]
+			 & 1 \cdot v \\
+			=& \sum_{s \in \Z^k} (1 \cdot \mu_s) \Xok \\
+			=& \sum_{s \in \Z^k} \mu_s \Xok \\
+			=& v
+		\end{aligned}$
+	\end{enumerate}
+	$(V, \cdot, +)$ satisfies all 8 properties, so it is a vector space.
+\end{proof}
+\end{theorem}

@@ -1,0 +1,34 @@
+\begin{lemma}
+	For the example with termination probability $< 1$,
+	\[ \resN{\wh^i\l(1\r)} = \hf \cdot \l(\frac{1}{4}\r)^{i-1} X^{i-1} F^1 \where i > 0 \]
+	\begin{proof}
+		We will prove the equation above without the restriction to $\lnot B$ and apply it afterwards. \\
+		Proof by induction over $i$. \\
+		\textbf{Base Case} for $i = 1$: \\
+		\[ \wh^1\l(1\r) = \qu X^1 F^0 + \hf X^0 F^1 \]
+		\textbf{Induction Hypothesis}:
+		\[ \wh^i\l(1\r) = \l(\qu\r)^i X^i F^0 + \hf \cdot \l(\qu\r)^{i-1} X^{i-1} F^1
+			\text{ for some } i > 0 \]
+		\textbf{Inductive Step}:
+		\begin{align*}
+			 & \wh^{i + 1}(1) \\
+			=& \wh( \wh^i(1) ) \\
+			 & \explain{definition of $\wh$} \\
+			=& \smtx{P}\l( \resP{ \wh^i(1) } \r) \\
+			 & \explain{induction hypothesis} \\
+			=& \smtx{P}\l( \resP{ \l(\qu\r)^i X^i F^0 +
+				\hf \cdot \l(\qu\r)^{i-1} X^{i-1} F^1 } \r) \\
+			 & \explain{$B = (F = 0)$} \\
+			=& \smtx{P}\l( \l(\qu\r)^i X^i F^0 \r) \\
+			 & \explain{$P = \l\{ \{ X := X + 1 \}[0.5]\{ \abort \} \r\}
+			 	[0.5] \{ F := 1 \}$} \\
+			=& \qu \cdot \l(\qu\r)^i X^{i+1} F^0 + \hf \cdot \l(\qu\r)^i X^i F^1 \\
+			=& \l(\qu\r)^{i+1} X^{i+1} F^0 + \hf \cdot \l(\qu\r)^i X^i F^1
+		\end{align*}
+		The intermediate claim is proven by induction.
+		The final result is now obtained by restriction to $\lnot B$.
+		\[ \resN{\wh^i(1)} = \resN{\l(\qu\r)^i X^i F^0 +
+			\hf \cdot \l(\qu\r)^{i-1} X^{i-1} F^1}
+			= \hf \cdot \l(\qu\r)^{i-1} X^{i-1} F^1			\qedhere \]
+	\end{proof}
+\end{lemma}

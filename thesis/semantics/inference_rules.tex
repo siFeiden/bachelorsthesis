@@ -1,0 +1,41 @@
+\section{Inference rules}
+
+\begin{prooftree}
+	\AxiomC{$G' = \smtx{X := e}(G)$}
+	\LeftLabel{ASS}
+	\UnaryInfC{$\{G\} X := e \{G'\}$}
+\end{prooftree}
+
+\begin{prooftree}
+	\AxiomC{$\emptyset$}
+	\LeftLabel{SKIP}
+	\UnaryInfC{$\{G\} skip \{G\}$}
+\end{prooftree}
+
+\begin{prooftree}
+	\AxiomC{$\emptyset$}
+	\LeftLabel{ABORT}
+	\UnaryInfC{$\{G\} abort \{0\}$}
+\end{prooftree}
+
+\begin{prooftree}
+	\AxiomC{$\{G\} P_1 \{G'\}$}
+	\AxiomC{$\{G'\} P_2 \{G''\}$}
+	\LeftLabel{SEQ}
+	\BinaryInfC{$\{G\} P_1; P_2 \{G''\}$}
+\end{prooftree}
+
+\begin{prooftree}
+	\AxiomC{$\{G\} P_1 \{G'\}$}
+	\AxiomC{$\{G\} P_2 \{G''\}$}
+	\LeftLabel{COND}
+	\BinaryInfC{$\{G\} \ \{P_1\}[p]\{P_2\} \ \{p \cdot G' + (1-p) \cdot G''\}$}
+\end{prooftree}
+
+
+\begin{prooftree}
+	\AxiomC{$\{\resP{G}\} P_1 \{G_t\}$}
+	\AxiomC{$\{\resN{G}\} P_2 \{G_f\}$}
+	\LeftLabel{IF}
+	\BinaryInfC{$\{G\} \ \ifp{B}{P_1}{P_2} \ \{G_t + G_f\}$}
+\end{prooftree}

@@ -1,0 +1,152 @@
+\subsection{Formal Power Series}
+A formal power series (FPS) \cite{wilf:generatingfunctionology} is a polynomial of degree $\infty$ over one variable, most commonly $X$.
+A formal power series $F$ is an object of the form
+\[ F = a_0 X^0 + a_1 \cdot X^1 + a_2 X^2 + \ldots = \infsum a_i X^i \]
+The coefficients $a_i$ are real numbers.
+When dealing with a formal power series $F$, $F$ is not meant to be a function.
+This means that $X$ is not necessarily substituted by a value, so properties like convergence are ignored. \\
+Formal power series can be added and multiplied.
+Addition comes in a very natural way, it is done componentwise:
+\[ F + G = \infsum a_i X^i + \infsum b_i X^i
+	= \infsum (a_i + b_i) X^i \]
+Multiplication is more complicated.
+\[ F \cdot G = \infsum c_i X^i \where c_i = \sum_{k = 0}^{i} a_k b_{i-k} \]
+The product of two formal power series is always defined because the sum of every coefficient $c_i$ consists of only finitely many elements.
+In fact, the formal power series form a ring under addition and multiplication.
+The ring's additive and multiplicative identities are
+\[ 0 = \infsum 0 X^i \text{ and } 1 = 1 X^0 + 0 X^1 + 0 X^2 + \ldots \]
+Later on, we will need another operation on formal power series, the scalar multiplication:
+\[ \alpha \cdot F = \infsum (\alpha \cdot a_i) X^i \where \alpha \in \R \]
+Obviously, scalar multiplication always has a formal power series as its result.
+Some formal power series even have a closed form.
+A closed form is desirable because it eases readability and calculation.
+As an example, let us have a look at the geometric series.
+It comes up often and is defined as follows:
+\[ G = 1 X^0 + p X^1 + p^2 X^2 + \ldots = \infsum p^i X^i \where |p| < 1 \]
+The closed form of this series is
+\[ G = \frac{1}{1 - pX} \]
+This means that $1 - pX$ is the multiplicative inverse of $G$.
+In other words: $G \cdot (1 - pX) = 1$ where 1 on the right hand side is the identity of the ring, as given above.
+In fact, the equation also holds if $|p| > 1$ because we do not consider convergence of the sums.
+$|p| < 1$ must only hold if we want to call a PGF a geometric series.
+
+\subsubsection*{Absolute Value}
+Despite ignoring convergence etc.\ during operations on formal power series, it is sometimes useful to know about the sum of all coefficients.
+Summing all coefficients is comparable to substituting the formal variable $X$ with 1, or evaluating the series at 1.
+It may happen that the sum diverges, but when it does not, it can have a meaningful interpretation as we will see later.
+Given a formal power series $G = \infsum a_i X^i$, define the absolute value $|G|$ as the sum of all its coefficients:
+\[ |G| = \infsum a_i \]
+Here, we have another reason why closed forms of formal power series are interesting.
+Consider the geometric series
+\[ G = \infsum \half^i X^i \]
+Now, calculate the absolute value of both the closed and non closed form.
+\begin{align*}
+	|G| &= \l| \infsum \half^i X^i \r| = \infsum \half^i = 2 \\
+	\\
+	|G| &= \l| \frac{1}{1 - \frac{1}{2} X} \r| = \frac{1}{1 - \frac{1}{2}} = 2
+\end{align*}
+Of course, they both have the same value because they are equivalent.
+Nonetheless, calculating the absolute value of the closed form is easier, since fractional arithmetic is simpler than reasoning about the value of a series. \\
+Note that, although the notation may suggest it, the absolute value is \emph{not} a norm in the classical sense.
+It is rather a linear function because the following holds:
+\[ |a \cdot G + F| = a \cdot |G| + |F| \]
+
+\subsection{Multivariate Formal Power Series}
+Multivariate formal power series are similar to formal power series except they can have more than one formal variable.
+A multivariate formal power series $G$ is an object of the form
+\[ G = \multisum{a_s} \where k \in \N_{> 0} \]
+Addition is defined componentwise as it is for formal power series.
+\[ F + G = \multisum{a_s} + \multisum{b_s} = \multisum{(a_s + b_s)} \]
+Multiplication again is more complicated, but is defined in a similar fashion as for formal power series.
+\begin{align*}
+	& F \cdot G = \multisum{c_s} \\
+	& \text{where } c_s = \sum_{\substack{n \in \N^k \land \\
+		n_j \leq s_j \text{ for all } j \in \{1,\dots,k\}}}
+		a_{n_1, \dots, n_k} \cdot b_{s_1 - n_1, \dots, s_k - n_k}
+\end{align*}
+The concepts of scalar multiplication and absolute value are defined as expected for multivariate formal power series.
+
+\subsection{Formal Power Series As Probability Generating Functions}
+We mentioned earlier that formal power series can be used as probability generating functions.
+Given a formal power series
+\[ G = \multisum{\mu_s} \]
+$\mu_s$ is interpreted as the probability that the random variables $X_1, \ldots, X_k$ have the values $s_1, \ldots, s_k$. In other words
+\[ \mathcal{P}(X_1 = s_1, \ldots, X_k = s_k) = \mu_s \]
+When used as PGFs, formal power series can still be added, scaled and multiplied.
+
+\subsection{Programs}
+In order to reason about probabilistic programs by means of a semantics, we need to define a programming language.
+We will use the same language as in \cite{clara:pgf}.
+It consists of seven different operations that can be combined to form programs.
+
+\subsubsection*{Basic Operations}
+\begin{enumerate}
+	\item $\nop$ \vspace{0.3\baselineskip} \\
+		The $\nop$ operation does nothing and simply goes on to the next operation.
+		It is useful in composite operations.
+	\item $\abort$ \vspace{0.3\baselineskip} \\
+		The $\abort$ operation does not terminate.
+	\item ${X := e}$ \vspace{0.3\baselineskip} \\
+		The variable $X$ is assigned the value of $e$.
+		$e$ is an expression over the program variables that is evaluated right before the assignment to $X$.
+\end{enumerate}
+\subsubsection*{Composite Operations}
+Here, $P, P_1$ and $P_2$ are programs and $B$ is a Boolean condition.
+\begin{enumerate}
+	\item ${P_1; P_2}$ \vspace{0.3\baselineskip} \\
+		The concatenation $P_1; P_2$ means to first execute $P_1$ and then $P_2$.
+	\item $\ifp{B}{P_1}{P_2}$ \vspace{0.3\baselineskip} \\
+		If the current variable valuations satisfy the condition $B$ then $P_1$ is executed, otherwise $P_2$ is executed.
+	\item $\{P_1\}[p]\{P_2\}$ for some $p \in [0, 1]$ \vspace{0.3\baselineskip} \\
+		This statement is called probabilistic choice and is what distinguishes this programming language from classical ones.
+		Either $P_1$ or $P_2$ is executed at random.
+		$P_1$ is executed with probability $p$ and $P_2$ is executed with probability $1-p$.
+	\item $\while{B}{P}$ \vspace{0.3\baselineskip} \\
+		The \emph{loop body} $P$ is repeatedly executed until the \emph{loop condition} $B$ is no longer satisfied by the program variables.
+\end{enumerate}
+
+\subsection{PGF Semantics}
+In \cite{clara:pgf}, a semantics for probabilistic programs with multivariate power series as probability generating functions is introduced.
+In the following, let $P$ be a program and $G$ be a PGF with
+\[ G = \multisum{\mu_s} \]
+where $k$ is equal to the number of program variables used in $P$. \\
+Every element of the sum in $G$ corresponds to one possible program state with its probability of occurrence.
+For example \[ \frac{1}{3} X_1^2 X_2^5 \] means that with probability $\frac{1}{3}$, variable $X_1$ has value 2 and variable $X_2$ has value 5.
+It is easy to see that the absolute value $|G|$ must be less than or equal to 1, because otherwise the total probability of all program states would be greater than 1.
+% $|G|$ is also the probability that a program terminates.
+Note that the sum of a PGF ranges over $\N^k$, so a variable cannot have a negative value.
+Assignments or rather expressions are constrained to only evaluate to positive values. \\
+Every $P$ has a corresponding function, denoted by $\smtx{P}$, that transforms an initial PGF into the PGF that results from executing $P$.
+These functions are defined next.
+\subsubsection*{Basic Operations}
+\begin{enumerate}
+	\item $\smtx{\nop}(G) = G$
+	\item $\smtx{\abort}(G) = 0 = \multisum{0}$
+	\item $\smtx{X_j := e}(G) = \sum\limits_{s \in \N^k} \mu_s X_1^{s_1} \cdots X_j^{e(s)} \cdots X_k^{s_k}$
+	\item
+	$\resP{G} = \sum\limits_{s \in \N^k} \begin{cases}
+	\mu_s X_1^{s_1} \cdots X_k^{s_k} &\text{if } s \models B \\
+	0 & \text{otherwise}
+	\end{cases}$ \\
+	\\
+	\item[] Above, $s$ is an element of $\N^k$.
+	$s_j$ refers to the $j$th components of $s$.
+	Of course, $1 \leq j \leq k$.
+\end{enumerate}
+\subsubsection*{Composite Operations}
+Here, $P,\ P_1$, and $P_2$ are programs and $B$ is a Boolean condition.
+\begin{enumerate}
+	\item $\smtx{P_1; P_2}(G) = \smtx{P_2}( \smtx{P_1}(G) )$
+	\item $\smtx{ \{P_1\}[p]\{P_2\} }(G) = p \cdot \smtx{P_1}(G) + (1-p) \cdot \smtx{P_2}(G)$
+	\item $\smtx{\ifp{B}{P_1}{P_2}}(G) = \smtx{P_1}(\resP{G}) + \smtx{P_2}(\resN{G})$
+	\item $\smtx{\while{B}{P}}(G) = \sup\limits_{n \in \N}
+		\l\{ \resN{\operatorname{H}_{P, B}^n(G)} \r\}
+		\where \operatorname{H}_{P, B}(G) = \smtx{P}(\resP{G}) + \resN{G}$ \\
+		$\operatorname{H}_{P, B}$ represents a single iteration of the loop body.
+\end{enumerate}
+Similar to how programs are concatenated to form longer programs, their individual semantics functions are composed to form the semantics function of the longer program. \\
+If $G'$ results from executing a program $P$ on an initial PGF $G$, i.e. $G' = \smtx{P}(G)$, then $|G'|$ is the termination probability of $P$ given the initial distribution.
+A simple example is $\abort$.
+Applying $\abort$ to any PGF always results in 0, which has absolute value 0, meaning its termination probability is 0.
+This is exactly how $\abort$ is defined.
+Later, we will see loops that have a termination probability of less than 1.
