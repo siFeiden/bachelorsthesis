@@ -1,0 +1,18 @@
+\begin{frame}
+	\frametitle{Wp-semantics}
+	\begin{enumerate}
+		\itemspacing{10pt}
+		\item Expectations: $ E = \{ \S \to \R_{\geq 0} \} $
+		\item $ \operatorname{wp} \colon E \to E $
+		\item $\wp{\nop, f} = f$.
+		\item $\wp{\abort, f} = 0$.
+		\item $\wp{X := e, f} = f[X/e]$.
+		\item $\wp{P; Q, f} = \wp{P, \wp{Q, f}}$.
+		\item $\wp{\ifp{B}{P}{Q}, f}
+			= [B] \cdot \wp{P, f} + [\lnot B] \cdot \wp{Q, f}$.
+		\item $\wp{\{ P \}[p]\{ Q \}, f}
+			= p \cdot \wp{P, f} + (1-p) \cdot \wp{Q, f}$.
+		\item $\wp{\while{B}{P}, f}
+			= \mu X. \l( [B] \cdot \wp{P, X} + [\lnot B] \cdot f \r)$.
+	\end{enumerate}
+\end{frame}

@@ -1,0 +1,22 @@
+\begin{frame}
+	\frametitle{Comparison of Semantics}
+		\begin{itemize}[<+->]
+			\itemspacing{7pt}
+			\item Comparison of PGF and wp semantics (McIver and Morgan)
+			\item Random variables: $ E = \{ \S \to \R_{\geq 0} \}$
+			\item $ \operatorname{wp} \colon P \times E \to E $
+			\item $ \smtx{P}(G) $ vs. $ \wp{P, f} $
+			\item $ \E_\mu (f) $, where $\mu$ a measure on program states, $f$ a random variable
+			\item Every PGF has a corresponding measure.
+		\end{itemize}
+		\uncover<+->{
+			\begin{center}
+				\begin{minipage}{0.9\textwidth}
+					\begin{theorem}
+						Given a program $P$, a measure $\mu$ and an expectation $f$, the following holds:
+						\[ \E_{\smtx{P}(\mu)} (f) = \E_\mu (\wp{P, f}) \]
+					\end{theorem}
+				\end{minipage}
+			\end{center}
+		}
+\end{frame}

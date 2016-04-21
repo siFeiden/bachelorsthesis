@@ -1,0 +1,183 @@
+\documentclass{beamer}
+
+
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{thmtools}
+\usepackage{stmaryrd}
+\usepackage{geometry}
+\usepackage{listings}
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{graphicx}
+
+%\setbeamertemplate{bibliography item}{\insertbiblabel}
+\setbeamertemplate{footline}[frame number]
+
+%\newtheorem{definition}{Definition}[section] % defines the definition environment
+%\newtheorem{theorem}{Theorem}[section] % defines the theorem environment
+%\newtheorem{lemma}{Lemma}[section]
+%\newtheorem{proof}{Proof}[section] % defines the proof environment
+
+% Sets and set operation
+\newcommand{\R}{\mathbb{R}} % the reals
+\newcommand{\Z}{\mathbb{Z}} % the integers
+\newcommand{\N}{\mathbb{N}} % the natural numbers
+\renewcommand{\S}{\mathbb{S}} % state space
+\newcommand{\leqD}{\sqsubseteq_{D}} % cpo
+\newcommand{\leqL}{\sqsubseteq_{L}} % cpo
+%\newcommand{\pot}[1]{\mathcal{P}(#1)} % power set
+
+\newcommand{\E}{\mathbb{E}}
+
+% Programs
+\newcommand{\smtx}[1]{\left\llbracket #1 \right\rrbracket} % semantic brackets
+\newcommand{\res}[2]{\left\langle #1 \right\rangle_{#2}} % restriction
+\newcommand{\resP}[1]{\res{#1}{B}} % restriction to B
+\newcommand{\resN}[1]{\res{#1}{\lnot B}} % restriction to not B
+\newcommand{\nop}{\textit{skip}} % skip statement
+\newcommand{\abort}{\textit{diverge}} % abort statement
+\newcommand{\ifp}[3]{\textit{if}\,(#1) \, \{ \, #2 \, \} \, \textit{else} \, \{ \, #3 \, \} } % if statement
+\newcommand{\while}[2]{\textit{while}\,(#1) \{#2\}} % while loop
+
+\newcommand{\wh}{\operatorname{wh}_{B, P}}
+\newcommand{\hh}{\operatorname{H}_{B, P}}
+\newcommand{\ww}{\operatorname{ww}_f}
+\renewcommand{\wp}[1]{\operatorname{wp}\l( #1 \r)}
+
+% Convenience
+\newcommand{\qu}{\frac{1}{4}} % 1 / 4
+\newcommand{\half}{\l( \frac{1}{2} \r)} % (1 / 2)
+\newcommand{\hf}{\frac{1}{2}} % 1 / 2
+\newcommand{\IH}[1]{\overset{IH}{#1}} % for induction hypothesis
+\newcommand{\pair}[1]{\left( #1 \right)} % round parentheses
+\renewcommand{\l}{\left} % short left
+\renewcommand{\r}{\right} % short right
+\newcommand{\infsum}{\sum\limits_{i = 0}^{\infty}} % sum from 0 to inf over variable i
+\newcommand{\multisum}[1]{\sum\limits_{s \in \N^k} #1 X_1^{s_1} \cdots X_k^{s_k}}
+\newcommand{\Xok}{X_1^{s_1} \cdots X_k^{s_k}} % variables X_1 to X_k
+\newcommand{\explain}[1]{\hspace*{2em} \l(\text{\small #1}\r)} % explanation in proof, indented line with smaller text
+\newcommand{\where}{, \text{ where }}
+
+% Display
+\renewcommand{\vert}{\ | \ }
+
+
+\addtolength{\jot}{0.5em} % increase align line spacing
+%\setlist{itemsep=20pt}
+\newcommand{\itemspacing}[1]{\setlength\itemsep{#1}}
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}	% horizontal lines for title
+
+% math symbol for general cartesian product, copied from kpfonts.sty, lines 611 & 1495
+\DeclareSymbolFont{largesymbolsA}{U}{jkpexa}{m}{n}
+\DeclareMathSymbol{\bigX}{\mathop}{largesymbolsA}{16}
+\newcommand{\bigtimes}{\bigX} % redundant declaration to make texstudio recognize \bigtimes
+
+
+% (re)define square subsets
+\DeclareFontFamily{U}{mathb}{\hyphenchar\font45}
+\DeclareFontShape{U}{mathb}{m}{n}{
+	<5> <6> <7> <8> <9> <10> gen * mathb
+	<10.95> mathb10 <12> <14.4> <17.28> <20.74> <24.88> mathb12
+}{} 
+\DeclareSymbolFont{mathb}{U}{mathb}{m}{n}
+\DeclareMathSymbol{\sqsubseteq} {3}{mathb}{"84}
+\DeclareMathSymbol{\sqsupseteq} {3}{mathb}{"85}
+\DeclareMathSymbol{\sqsubsetneq}{3}{mathb}{"88}
+\DeclareMathSymbol{\sqsupsetneq}{3}{mathb}{"89}
+
+
+\lstset{language=Java} % lstlisting language
+%\setlist[description]{font=\normalfont\space} % normal font in description env. labels
+
+
+
+
+\title{Extending Probability Generating Function Semantics to Negative Variable Valuations}
+\subtitle{Bachelor Colloquium}
+\date{12.04.2016}
+\author{Simon Feiden}
+
+
+\begin{document}
+	
+	
+\maketitle
+
+%\begin{frame}
+%	\tableofcontents
+%\end{frame}
+
+
+\section{Motivation}
+\input{bounds/introduction.tex}
+
+
+\section{Preliminaries}
+\input{semantics/preliminaries.tex}
+
+
+\section{Semantics}
+\input{semantics/basic.tex}
+
+
+\section{Extended Semantics}
+\input{semantics/extended.tex}
+ 
+
+\section{Case Studies}
+\input{semantics/examples.tex}
+
+
+\section{Semantics Equivalence}
+\input{semantics/equivalence.tex}
+
+
+\section{Bisimulations}
+\input{semantics/bisimulations.tex}
+
+
+\section{Contribution}
+\input{bounds/contribution.tex}
+
+
+\begin{frame}
+	\frametitle{\ }
+	\begin{center}
+		\LARGE Thank you for your attention!
+	\end{center}
+\end{frame}
+
+
+\begin{frame}
+	% empty frame
+\end{frame}
+
+
+\input{bounds/more.tex}
+
+
+\bibliographystyle{alpha}
+\bibliography{literature}
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

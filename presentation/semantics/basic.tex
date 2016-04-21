@@ -1,0 +1,53 @@
+\begin{frame}{PGFs and Programs}
+	
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\begin{itemize}[<+->]
+				\itemspacing{10pt}
+				\item $ G = \alert<+(1)>{0.4} \alert<+(-1)>{X^1 Y^0}
+					+ \alert<+(1)>{0.6} \alert<+(-1)>{X^4 Y^4} $
+				\item $\nop$
+				\item<.-> $\abort$
+				\item<.-> ${X := e}$
+			\end{itemize}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\begin{itemize}[<.->]
+				\itemspacing{10pt}
+				\item<+-> ${P_1; P_2}$
+				\item $\ifp{B}{P_1}{P_2}$
+				\item $\{P_1\}[p]\{P_2\}$
+				\item $\while{B}{P}$
+			\end{itemize}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+%\begin{frame}
+%\frametitle{PGF Semantics}
+%	\begin{itemize}
+%		\itemspacing{20pt}
+%		\item<1-> $\smtx{\nop}(G) = G$
+%		\item<2-> $\smtx{\abort}(G) = 0$
+%		\item<3-> $\smtx{X_j := e}(G) = \sum\limits_{s \in \N^k} \mu_s X_1^{s_1}
+%			\cdots X_j^{e(s)} \cdots X_k^{s_k}$
+%		\item<4->
+%			$\resP{G} = \sum\limits_{s \in \N^k} \begin{cases}
+%				\mu_s X_1^{s_1} \cdots X_k^{s_k} &\text{if } s \models B \\
+%				0 & \text{otherwise}
+%			\end{cases}$
+%		\item<5-> $ \res{0.4 X^1 Y^0 + 0.6 X^4 Y^4}{X = 1} = 0.4 X^1 Y^0 $
+%	\end{itemize}
+%\end{frame}
+%
+%\begin{frame}
+%	\frametitle{PGF Semantics}
+%	\begin{itemize}
+%		\itemspacing{20pt}
+%		\item<1-> $\smtx{P_1; P_2}(G) = \smtx{P_2}( \smtx{P_1}(G) )$
+%		\item<2-> $\smtx{ \{P_1\}[p]\{P_2\} }(G) = p \cdot \smtx{P_1}(G) + (1-p) \cdot \smtx{P_2}(G)$
+%		\item<3-> $\smtx{\ifp{B}{P_1}{P_2}}(G) = \smtx{P_1}(\resP{G}) + \smtx{P_2}(\resN{G})$
+%		\item<4-> $\smtx{\while{B}{P}}(G) = \sup\limits_{n \in \N}
+%		\l\{ \resN{\operatorname{H}_{P, B}^n(G)} \r\} $
+%	\end{itemize}
+%\end{frame}

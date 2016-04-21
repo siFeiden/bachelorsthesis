@@ -1,0 +1,176 @@
+\begin{frame}[fragile]
+	\frametitle{Canonical Example}
+	\begin{lstlisting}
+ while ( F = 0 ) {
+   { X := X - 1 }[0.5]{ F := 1 }
+ }
+	\end{lstlisting}
+	\begin{itemize}
+		\itemspacing{10pt}
+		\item<2-> $ \smtx{\while{B}{P}}(G) = 
+			\sum\limits_{i = 0}^{\infty} \alert<3>{ \resN{\wh^i(G)} } $
+		\item<4-> $ B = (F = 0) $
+		\item<5-> $ P = \{ X := X - 1 \}[0.5]\{ F := 1 \} $
+		\item<6-> $ G = 1 X^0 F^0 = 1 $
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Canonical Example}
+	\begin{itemize}[<+->]
+		\itemspacing{10pt}
+		\item $ \resN{\wh^1(1)} = \hf X^0 F^1 $
+		\item $ \resN{\wh^2(1)} = \qu X^{-1} F^1 $
+%		\item $ \ldots $
+		\item $\resN{\wh^n(1)} = \half^n X^{-(n-1)} F^1 $
+		\item $ \sum\limits_{i = 0}^{\infty} \resN{\wh^i(G)}
+			= \alert<.>{\hf \cdot \sum\limits_{i = 0}^{\infty} \half^i X^{-i} F^1} $
+		\item Closed form: $ \frac{F}{2 - X^{-1}} $
+		\item Actually: $ \pair{0, \frac{F}{2 - X^{-1}}, 0, 0} $
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Termination Probability}
+\begin{lstlisting}
+while ( F = 0 ) {
+  {
+    { X := X + 1 }[0.5]{ diverge }
+  }[0.5]{
+    F := 1
+  }
+}
+\end{lstlisting}
+\begin{itemize}[<+(1)->]
+	\itemspacing{10pt}
+	\item $ \resN{\wh^i \l(G\r)} = \hf \cdot \l(\frac{1}{4}\r)^{i-1} X^{i-1} F^1 $
+	\item $ \sum\limits_{i = 0}^{\infty} \resN{\wh^i(G)}
+	= \alert{\hf \cdot \sum\limits_{i = 0}^{\infty} \l(\frac{1}{4}\r)^i X^i F^1} $
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Termination Probability}
+	\begin{itemize}[<+->]
+		\itemspacing{10pt}
+		
+		\item Closed form: $ \frac{F}{2 - \hf X} $
+		\item Termination probability using absolute value:
+		\item $ \l| \hf \cdot \sum\limits_{i = 0}^{\infty} \l(\frac{1}{4}\r)^i X^i F^1 \r|
+			\uncover<+->{
+				= \hf \cdot \sum\limits_{i = 0}^{\infty} \l(\frac{1}{4}\r)^i 
+			}
+			\uncover<+->{
+				=  \frac{2}{3}
+			} $
+		\item $ \l| \frac{F}{2 - \hf X} \r| = \frac{1}{2 - \hf} = \frac{2}{3} $
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Equivalent Programs}
+	\begin{columns}
+		\begin{column}[t]{0.5\textwidth}
+			\begin{lstlisting}[basicstyle=\scriptsize]
+while ( F = 0 ) {
+  { X := X + 1 }[p]{ F := 1 }
+};
+ 
+F := 0;
+while ( F = 0 ) {
+  { X := X - 1 }[q]{ F := 1 }
+}
+			\end{lstlisting}
+		\end{column}
+		\hspace{-20pt}
+		{ \vrule width 1pt }
+%		\vrule{}
+		\hspace{7pt}
+		\begin{column}[t]{0.5\textwidth}
+			\begin{lstlisting}[basicstyle=\scriptsize]
+{ F := 0 }[0.5]{ F := 1 };
+if ( F = 0 ) {
+  while ( F = 0 ) {
+    { X := X + 1 }[p]{ F := 1 }
+  }
+
+} else {
+  F := 0;
+  while ( F = 0 ) {
+    X := X - 1;
+    { skip }[q]{ F := 1 }
+  }
+}
+			\end{lstlisting}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Equivalent Programs}
+	\begin{columns}
+		\begin{column}[t]{0.5\textwidth}
+			\begin{lstlisting}[basicstyle=\tiny]
+while ( F = 0 ) {
+  { X := X + 1 }[p]{ F := 1 }
+};
+
+F := 0;
+while ( F = 0 ) {
+  { X := X - 1 }[q]{ F := 1 }
+}
+			\end{lstlisting}
+		\end{column}
+		\begin{column}[t]{0.5\textwidth}
+			\begin{lstlisting}[basicstyle=\tiny]
+{ F := 0 }[0.5]{ F := 1 };
+if ( F = 0 ) {
+  while ( F = 0 ) {
+    { X := X + 1 }[p]{ F := 1 }
+  }
+
+} else {
+  F := 0;
+  while ( F = 0 ) {
+    X := X - 1;
+    { skip }[q]{ F := 1 }
+  }
+}
+			\end{lstlisting}
+		\end{column}
+	\end{columns}
+	\begin{itemize}[<+->]
+		\item Introduced by Kiefer et al. in 2012.
+		\item Proven equivalent in distribution for $p = \frac{1}{2}$ and $q = \frac{2}{3}$.
+		\item Expected value of $X$ is the same if $q = \frac{1}{2-p}$. (Gretz et al.)
+		\item Today: equivalence in distribution if $q = \frac{1}{2-p}$.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Equivalent Programs}
+	\begin{itemize}[<+->]
+		\item First program's semantics: \\[10pt]
+			$ \alert<.(4)>{ \frac{(1-q) \cdot (1-p)}{1-qp} } \cdot	% factor
+			\pair{
+				\alert<.(2)>{ \frac{F}{1 - p X} }, \ % first entry sum
+				\alert<.(4)>{ q } \cdot	% second entry factor
+					\alert<.(3)>{ \frac{X^{-1} F}{1 - q X^{-1}} } % snd entry sum
+				, 0, 0 % null entries
+			} $
+			\vspace*{20pt}
+		\item Second program's semantics: \\[10pt]
+			$ \pair{
+				\alert<.(3)>{ \frac{1-p}{2} } \cdot	% first entry factor
+					\alert<.(1)>{ \frac{F}{1 - p X} }, \ % first entry sum
+				\alert<.(3)>{ \frac{1-q}{2} } \cdot	% second entry factor
+					\alert<.(2)>{ \frac{X^{-1} F}{1 - q X^{-1}} } % snd entry sum
+					, 0, 0 % null entries
+			} $
+			\vspace*{20pt}
+		\item<+(3)-> Solve $ \frac{(1-q) \cdot (1-p)}{1-qp} = \frac{1-p}{2} $ and
+			$ \frac{(1-q) \cdot (1-p) \cdot q}{1-qp} = \frac{1-q}{2} $.
+			\vspace*{10pt}
+		\item<+(3)-> Equivalent in distribution if $ q = \frac{1}{2 - p}$.
+	\end{itemize}
+\end{frame}

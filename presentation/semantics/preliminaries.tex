@@ -1,0 +1,27 @@
+\begin{frame}
+	\frametitle{Formal Power Series}
+	\begin{itemize}[<+->]
+		\itemspacing{20pt}
+		\item $ G = \alert<+(1)>{a_0} \alert<+(-1)>{X^0}
+			+ \alert<.>{a_1} \alert<.(-1)>{X^1}
+			+ \alert<.>{a_2} \alert<.(-1)>{X^2} + \ldots
+			= \infsum \alert<.>{a_i} \alert<.(-1)>{X^i} $
+		\item $ 4 X^2 + 9 X^7 $
+		\item $ \infsum \half^i X^i \only<+->{ = \frac{1}{1 - \hf X} } $
+		\item Multivariate FPS: $ \multisum{\mu_s} $
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Operations on FPS}
+	
+	\begin{itemize}[<+->]
+		\itemspacing{10pt}
+		\item Let $ G = \infsum a_i X^i $ \uncover<+->{ and $ F = \infsum b_i X^i $. }
+		\item $ G + F = \infsum (a_i + b_i) X^i $
+		\item $ \alpha \cdot G = \infsum (\alpha \cdot a_i) X^i $
+		\item $ |G| = \infsum a_i $
+		\item Analogous for multivariate FPS
+	\end{itemize}
+\end{frame}
+

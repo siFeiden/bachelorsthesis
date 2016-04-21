@@ -1,0 +1,121 @@
+\begin{frame}
+	\frametitle{Challenges}
+	\begin{itemize}
+		\itemspacing{20pt}
+		\item<1-> Extension to negative variable valuations
+		\item<2-> Use formal power series
+		\item<3-> Usage of closed forms (requires a ring)
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Extended PGFs}
+	\begin{itemize}[<+->]
+		\itemspacing{20pt}
+		\item $ \sum\limits_{s \in \alert<+>{\N^k} } \mu_s \Xok $
+		\item $ \sum\limits_{s \in \alert<.>{\Z^k} } \mu_s \Xok $
+		\item No ring, no closed forms.
+		\item Solution: Use PGFs for partitions of the state space.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Partitions}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\begin{itemize}
+				\itemspacing{10pt}
+				\item<1-> One variable X
+				\item<2-> State space is $\Z$.
+				\item<3-> Partitions are \\
+					$\phantom{-}\N$ \\
+					$-\N_{> 0}$ \\
+					$\phantom{\N}$ \\ % empty lines for alignment with second column
+					$\phantom{\N}$
+			\end{itemize}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\begin{itemize}
+				\itemspacing{10pt}
+				\item<4-> Two variables X, Y
+				\item<5-> State space is $\Z^2$.
+				\item<6-> Partitions are \\
+					$\phantom{-}\N_{\phantom{> 0}} \times \phantom{-}\N  $  \\
+					$          -\N_{> 0}				   \times \phantom{-}\N  $  \\
+					$\phantom{-}\N_{\phantom{> 0}} \times           -\N_{> 0}$  \\
+					$          -\N_{> 0}				   \times           -\N_{> 0}$
+			\end{itemize}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Partitions}
+	\begin{itemize}[<+->]
+		\item $ S_1, S_2, \ldots, S_{2^k} $
+		\item $ \sum\limits_{s \in \alert<.>{S_1}} \mu_s \Xok, $ \\[10pt]
+			\uncover<+->{
+					$ \sum\limits_{s \in \alert<.>{S_2}} \mu_s \Xok, $ \\[10pt]
+			}
+			\uncover<+->{
+					$ \vdots $ \\[10pt]
+					$ \sum\limits_{s \in \alert<.>{S_{2^k}}} \mu_s \Xok $
+			}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Semantic Tuples}
+	\begin{definition}[Semantic Tuple]
+		Let $P$ be a program of $k$ variables.
+		A \emph{semantic tuple} $T_G$ is an object of the form
+		\[ T_G = \l( \sum_{s \in \alert<1>{S_1}} \mu_s \Xok, \ldots,
+		\sum_{s \in \alert<1>{S_{2^k}}} \mu_s \Xok \r) \]
+	\end{definition}
+	\begin{itemize}
+		\itemspacing{10pt}
+		\item<2-> Number of entries grows exponentially.
+		\item<3-> Use extended PGFs: $ \sum\limits_{s \in \Z^k} \mu_s \Xok $
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{PGF Semantics}
+	\begin{itemize}[<+->]
+		\itemspacing{20pt}
+		\item $\smtx{\nop}(G) = G$
+		\item $\smtx{\abort}(G) = 0$
+		\item $\smtx{X_j := e}(G) = \sum\limits_{s \in \Z^k} \mu_s X_1^{s_1}
+		\cdots X_j^{ \alert<+>{ e(s) } } \cdots X_k^{s_k}$
+		\item $\resP{G} = \sum\limits_{s \in \Z^k} \begin{cases}
+				\mu_s X_1^{s_1} \cdots X_k^{s_k} &\text{if } s \models B \\
+				0 & \text{otherwise}
+			\end{cases}$
+		\item $ \res{0.4 X^1 Y^0 + 0.6 X^4 Y^4}{X = 1} = 0.4 X^1 Y^0 $
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{PGF Semantics}
+	\begin{itemize}[<+->]
+		\itemspacing{20pt}
+		\item $\smtx{P_1; P_2}(G) = \smtx{P_2}( \smtx{P_1}(G) )$
+		\item $\smtx{ \{P_1\}[p]\{P_2\} }(G) = p \cdot \smtx{P_1}(G) + (1-p) \cdot \smtx{P_2}(G)$
+		\item $\smtx{\ifp{B}{P_1}{P_2}}(G) = \smtx{P_1}(\resP{G}) + \smtx{P_2}(\resN{G})$
+		\item $ \smtx{\while{B}{P}}(G) $
+%			= \sum\limits_{i = 0}^{\infty} \resN{\wh^i(G)} $
+%		\item $ \wh(G) = \smtx{P}(\resP{G}) $
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Loop semantics}
+	\begin{itemize}[<+->]
+		\itemspacing{10pt}
+		\item $ \wh(G) = \smtx{P}(\resP{G}) $
+		\item $ \wh^{\alert<.>{n}}(G) $ is the $n$th loop iteration.
+		\item $ \alert<.(1)>{ \resN{ \wh^{n}(G) } } $ drops out after $n$ iterations.
+		\item $ \smtx{\while{B}{P}}(G)
+			= \sum\limits_{i = 0}^{\infty} \alert<.>{ \resN{\wh^i(G)} } $
+	\end{itemize}
+\end{frame}
